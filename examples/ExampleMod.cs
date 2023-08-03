@@ -37,7 +37,7 @@ namespace ExampleMod
             somePercentage = preferences.CreateEntry("somePercentage", 1f);
             buttonPressed = preferences.CreateEntry("buttonPressed", false);
             dropDownValue = preferences.CreateEntry("dropDownValue", "");
-            multipleChoiceValue = preferences.CreateEntry("MutlipleChoiceValue", "");
+            multipleChoiceValue = preferences.CreateEntry("multipleChoiceValue", "");
         }
 
         [HarmonyPatch(typeof(OptionsController))]
@@ -53,7 +53,7 @@ namespace ExampleMod
             [HarmonyPostfix]
             static void AddTabs_Postfix(OptionsController __instance)
             {
-                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "menu_example", "some-icon.png");
+                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "some-icon.png");
                 CustomTab = new Tab("TestTab", SpriteImporter.LoadSprite(imagePath));
                 CustomTab.OnTabCreation(__instance);
 
