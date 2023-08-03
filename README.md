@@ -3,8 +3,8 @@ A library for enabling modifying Vampire Survivors' menu
 
 ## Features
 Create a new custom tab with custom:
- - Tab icon
- - Tab title
+ - icon
+ - title
  - button
  - slider
  - tickbox
@@ -15,6 +15,7 @@ Create a new custom tab with custom:
 This library is NOT a mod for Vampire Survivors. It's a library that mods can use. Installing only this to Vampire Survivors will do nothing.
 
 ### Requirements
+ - New Engine version of Vampire Survivors
  - MelonLoader installed
  - A mod for Vampire Survivors that utilizes this library.
 
@@ -104,6 +105,7 @@ static class Example_OptionsController_Patch
 
 ## Known Bugs
  - After being in a game, the custom tab doesn't render any longer.
+ - Tab icon isn't highlighted when tab is selected.
 
 ## TODO
  - Clean up interface
