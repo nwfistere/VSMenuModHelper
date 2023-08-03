@@ -1,25 +1,35 @@
 # VSMenuModHelper
 A library for enabling modifying Vampire Survivors' menu
 
-# Installation as dependency
+## Features
+Create a new custom tab with custom:
+ - Tab icon
+ - Tab title
+ - button
+ - slider
+ - tickbox
+ - dropdown
+ - multiple choice buttons
+
+## Installation as dependency
 This library is NOT a mod for Vampire Survivors. It's a library that mods can use. Installing only this to Vampire Survivors will do nothing.
 
-## Requirements
+### Requirements
  - MelonLoader installed
  - A mod for Vampire Survivors that utilizes this library.
 
-## Install
+### Install
 1. Download dll (link)
 2. Install dll into Vampire Survivors' mods directory.
 
 
-# Developers: How to consume
+## Developers: How to consume
 1. Download and Install library
 2. Point Visual Studio at dll
 3. Utilize library (see example)
 
 
-# Example Usage
+## Example Usage
 Assuming the mod is a MelonLoader Melon and uses Harmony:
 
 ### Create new tab in Options Menu
@@ -91,3 +101,13 @@ static class Example_OptionsController_Patch
 ```
 ### Produces
 <Imge here>
+
+## Known Bugs
+ - After being in a game, the custom tab doesn't render any longer.
+
+## TODO
+ - Clean up interface
+ - Add option for library to handle Harmony patches
+ - Add option to alter existing tabs
+ - **Add pause menu options**
+ - Example mod in src
