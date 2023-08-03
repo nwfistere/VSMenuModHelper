@@ -1,2 +1,93 @@
 # VSMenuModHelper
 A library for enabling modifying Vampire Survivors' menu
+
+# Installation as dependency
+This library is NOT a mod for Vampire Survivors. It's a library that mods can use. Installing only this to Vampire Survivors will do nothing.
+
+## Requirements
+ - MelonLoader installed
+ - A mod for Vampire Survivors that utilizes this library.
+
+## Install
+1. Download dll (link)
+2. Install dll into Vampire Survivors' mods directory.
+
+
+# Developers: How to consume
+1. Download and Install library
+2. Point Visual Studio at dll
+3. Utilize library (see example)
+
+
+# Example Usage
+Assuming the mod is a MelonLoader Melon and uses Harmony:
+
+### Create new tab in Options Menu
+```C#
+[HarmonyPatch(typeof(OptionsController))]
+static class Example_OptionsController_Patch
+{
+    private static Tab CustomTab;
+
+    [HarmonyPatch(nameof(OptionsController.GenerateNavigation))]
+    [HarmonyPostfix]
+    static void GenerateNavigation_Postfix() => Tab.OnGenerateNavigation();
+
+    [HarmonyPatch(nameof(OptionsController.AddTabs))]
+    [HarmonyPostfix]
+    static void AddTabs_Postfix(OptionsController __instance, System.Reflection.MethodBase __originalMethod)
+    {
+        string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "menu_example", "some-icon.png");
+        CustomTab = new Tab("TestTab", SpriteImporter.LoadSprite(imagePath));
+        CustomTab.OnTabCreation(__instance);
+
+        System.Action addButton = () =>
+        {
+            __instance.AddLabeledButton("Labeled button", "button text", new System.Action(() => {
+                Logger.Log("Button pressed!");
+            }), false);
+
+            __instance.AddSlider("Slider text", 1f, new System.Action<float>((value) => {
+                Logger.Log($"New slider value {value}");
+            }), false);
+
+            __instance.AddTickBox("Tickbox text", false, new System.Action<bool>((value) => {
+                Logger.Log($"New tickbox value {value}");
+            }), false);
+
+            List<string> DropDownList = new List<string>();
+            DropDownList.Add("one"); DropDownList.Add("two"); DropDownList.Add("three");
+            __instance.AddDropDown("Dropdown text", DropDownList, 0, new System.Action<int>((value) => {
+                Logger.Log($"New dropdown value {DropDownList[value]}");
+            }), 4, false);
+
+            List<string> ButtonLabelList = new List<string>();
+            ButtonLabelList.Add("one"); ButtonLabelList.Add("two"); ButtonLabelList.Add("three"); ButtonLabelList.Add("four");
+            System.Action<int> MultipleChoiceValue = ((value) => { Logger.Log($"New MultipleChoiceValue value {value}"); });
+            List<Il2CppSystem.Action> MultipleChoiceCBs = new List<Il2CppSystem.Action>();
+            MultipleChoiceCBs.Add(new System.Action(() => MultipleChoiceValue(0)));
+            MultipleChoiceCBs.Add(new System.Action(() => MultipleChoiceValue(1)));
+            MultipleChoiceCBs.Add(new System.Action(() => MultipleChoiceValue(2)));
+            MultipleChoiceCBs.Add(new System.Action(() => MultipleChoiceValue(3)));
+            __instance.AddMultipleChoice("Multiple Choice", ButtonLabelList, MultipleChoiceCBs, 0, false);
+        };
+
+        CustomTab.OnBuildPage(addButton);
+    }
+
+    [HarmonyPatch(nameof(OptionsController.GetTabSprite))]
+    [HarmonyPostfix]
+    static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = Tab.OnGetTabSprite(t) ?? __result;
+
+    [HarmonyPatch(nameof(OptionsController.BuildPage))]
+    [HarmonyPrefix]
+    static bool BuildPage_Prefix(OptionsController __instance, OptionsController.OptionsTabType type) => !Tab.OnBuildPage(type);
+
+    [HarmonyPatch(nameof(OptionsController.GetTabName))]
+    [HarmonyPostfix]
+    static void GetTabName_Postfix(OptionsController __instance, OptionsController.OptionsTabType t, ref string __result) => __result = Tab.OnGetTabName(t) ?? __result;
+}
+
+```
+### Produces
+<Imge here>
