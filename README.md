@@ -99,8 +99,8 @@ static class Example_OptionsController_Patch
 }
 
 ```
-### Produces
-<Imge here>
+### Produces!
+![Custom menu](https://github.com/nwfistere/VSMenuModHelper/assets/9168048/e990c69c-17bb-4983-b530-1cd4ff4cc368)
 
 ## Known Bugs
  - After being in a game, the custom tab doesn't render any longer.
