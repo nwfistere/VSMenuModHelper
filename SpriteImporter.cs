@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
+using System;
+using System.IO;
 
 namespace VSMenuHelper
 {
-    internal class SpriteImporter
+    public class SpriteImporter
     {
         public static Texture2D LoadTexture(string FilePath)
         {
