@@ -1,12 +1,11 @@
-﻿using Il2CppInterop.Runtime;
+﻿using Il2CppVampireSurvivors.App.Tools;
 using Il2CppVampireSurvivors.UI;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
-using UnityEngine.UI;
-using Il2CppVampireSurvivors.App.Tools;
-using static Il2CppVampireSurvivors.UI.OptionsController;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
+using static Il2CppVampireSurvivors.UI.OptionsController;
 
 namespace VSMenuHelper
 {
@@ -35,7 +34,7 @@ namespace VSMenuHelper
         }
 
          
-        public static Action<OptionsTabType> selectTab = (OptionsTabType type) => {
+        private static Action<OptionsTabType> selectTab = (OptionsTabType type) => {
             if (StaticOptionsController != null)
             { 
                 StaticOptionsController.SelectTab(type);
@@ -51,7 +50,7 @@ namespace VSMenuHelper
                 throw new Exception("Cannot init twice!");
             }
 
-            if (createdTabs == null || createdTabs.Select((pair) =>  pair.Value.TabName == this.TabName).Count() > 0)
+            if (createdTabs == null || createdTabs.Select((pair) => pair.Value.TabName == TabName).Any())
             {
                 return;
             }
@@ -90,7 +89,7 @@ namespace VSMenuHelper
         public static Sprite? OnGetTabSprite(OptionsTabType type)
         {
             return createdTabs.Where((pair) => pair.Key == type)
-                .Select((pair) => pair.Value.tabObject.GetComponent<Image>().sprite).FirstOrDefault((Sprite)null);
+                .Select((pair) => pair.Value.tabObject.GetComponent<Image>().sprite).FirstOrDefault(null as Sprite);
         }
 
         public static string? OnGetTabName(OptionsTabType type)
@@ -101,7 +100,7 @@ namespace VSMenuHelper
 
         public static bool OurTab(OptionsTabType type)
         {
-            return createdTabs.Where((pair) => pair.Key == type).Count() > 0;
+            return createdTabs.Where((pair) => pair.Key == type).Any();
         }
 
         public void OnBuildPage(Action action)
@@ -123,7 +122,7 @@ namespace VSMenuHelper
 
         public static void OnGenerateNavigation()
         {
-            if (StaticOptionsController != null && createdTabs.Count() > 0)
+            if (StaticOptionsController != null && createdTabs.Count > 0)
             {
                 foreach(KeyValuePair<OptionsTabType, Tab> pair in createdTabs)
                 {

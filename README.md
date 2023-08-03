@@ -12,7 +12,7 @@ Create a new custom tab with custom:
  - multiple choice buttons
 
 ## Installation as dependency
-This library is NOT a mod for Vampire Survivors. It's a library that mods can use. Installing only this to Vampire Survivors will do nothing.
+This library is NOT a mod for Vampire Survivors. It's a library that mods can utilize. Installing only this to Vampire Survivors will do nothing.
 
 ### Requirements
  - New Engine version of Vampire Survivors
@@ -21,7 +21,7 @@ This library is NOT a mod for Vampire Survivors. It's a library that mods can us
 
 ### Install
 1. Download dll (link)
-2. Install dll into Vampire Survivors' mods directory.
+2. Install dll into Vampire Survivors' mods directory along with the Mod dependent on this library.
 
 
 ## Developers: How to consume
