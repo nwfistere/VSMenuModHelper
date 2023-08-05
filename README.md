@@ -31,9 +31,10 @@ This library is NOT a mod for Vampire Survivors. It's a library that mods can ut
 
 
 ## Example Result
-![Custom menu](https://github.com/nwfistere/VSMenuModHelper/assets/9168048/e990c69c-17bb-4983-b530-1cd4ff4cc368)
+![Custom Tab in the options menu](https://github.com/nwfistere/VSMenuModHelper/assets/9168048/6b4cccaf-058a-4598-8791-c2a2d174f741)
 
 ## Known Bugs
+
  - Tabs are currently displayed while in game, not only on the options menu.
 
 ## TODO
