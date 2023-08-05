@@ -86,8 +86,9 @@ namespace ExampleMod
             MenuHelper.AddElementToTab("Config Tab", new MultipleChoice("DropDown", new() { "one", "two", "three" }, new() { () => action(0), () => action(1), () => action(2) }, () => multipleChoiceValue.Value));
         }
 
+        // Must be added to consume the library. This adds the Tabs to the game.
         [HarmonyPatch(typeof(OptionsController))]
-        class Example_OptionsController_Patch2
+        class Example_OptionsController_Patch
         {
 
             [HarmonyPatch(nameof(OptionsController.Initialize))]

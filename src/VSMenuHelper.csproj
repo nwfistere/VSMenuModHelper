@@ -4,6 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>VSMenuHelper</Title>
+    <IncludeSymbols>False</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
