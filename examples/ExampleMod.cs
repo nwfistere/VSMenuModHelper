@@ -90,6 +90,9 @@ namespace ExampleMod
         [HarmonyPatch(typeof(OptionsController))]
         class Example_OptionsController_Patch
         {
+            [HarmonyPatch(nameof(OptionsController.Construct))]
+            [HarmonyPrefix]
+            static void Construct_Prefix() => MenuHelper.Construct_Prefix();
 
             [HarmonyPatch(nameof(OptionsController.Initialize))]
             [HarmonyPrefix]
@@ -102,7 +105,6 @@ namespace ExampleMod
             [HarmonyPatch(nameof(OptionsController.BuildPage))]
             [HarmonyPrefix]
             static bool BuildPage_Prefix(OptionsController __instance, OptionsTabType type) => MenuHelper.OnBuildPage(__instance, type);
-
         }
     }
 }

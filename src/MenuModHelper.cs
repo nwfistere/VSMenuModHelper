@@ -28,13 +28,9 @@ namespace VSMenuHelper
             createdTabs.First((tab) => tab.TabName == identifier).AddElement(element);
         }
 
-        public void Initialize_Prefix(OptionsController controller)
-        {
-            foreach (Tab tab in createdTabs)
-            {
-                tab.Init(controller);
-            }
-        }
+        public void Construct_Prefix() => createdTabs.ForEach((tab) => tab.Reset());
+
+        public void Initialize_Prefix(OptionsController controller) => createdTabs.ForEach((tab) => tab.Init(controller));
 
         // Returns true if BuildPage should run (We didn't do anything). False if it shouldn't.
         public bool OnBuildPage(OptionsController controller, OptionsTabType type)
@@ -86,5 +82,7 @@ namespace VSMenuHelper
         {
             return SpriteImporter.LoadSprite(TabButtonSpritePath);
         }
+
+        public void Reset() => alreadyInit = false;
     }
 }

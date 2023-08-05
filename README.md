@@ -35,7 +35,7 @@ This library is NOT a mod for Vampire Survivors. It's a library that mods can ut
 
 ## Known Bugs
 
- - Tabs disappear after game finishes.
+ - Tabs also show in the in game options window.
 
 ## TODO
  - Add option to only display in option menu or in game.
