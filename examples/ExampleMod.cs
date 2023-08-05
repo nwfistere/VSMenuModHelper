@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Il2CppSystem.Collections.Generic;
+using Il2CppSystem.Runtime.Remoting.Messaging;
 using Il2CppVampireSurvivors.UI;
 using MelonLoader;
 using System;
@@ -27,8 +28,8 @@ namespace ExampleMod
         private static MelonPreferences_Entry<bool> someToggle;
         private static MelonPreferences_Entry<float> somePercentage;
         private static MelonPreferences_Entry<bool> buttonPressed;
-        private static MelonPreferences_Entry<string> dropDownValue;
-        private static MelonPreferences_Entry<string> multipleChoiceValue;
+        private static MelonPreferences_Entry<int> dropDownValue;
+        private static MelonPreferences_Entry<int> multipleChoiceValue;
 
         private static MenuHelper MenuHelper;
 
@@ -39,11 +40,33 @@ namespace ExampleMod
             someToggle = preferences.CreateEntry("someToggle", true);
             somePercentage = preferences.CreateEntry("somePercentage", 1f);
             buttonPressed = preferences.CreateEntry("buttonPressed", false);
-            dropDownValue = preferences.CreateEntry("dropDownValue", "");
-            multipleChoiceValue = preferences.CreateEntry("multipleChoiceValue", "");
+            dropDownValue = preferences.CreateEntry("dropDownValue", 0);
+            multipleChoiceValue = preferences.CreateEntry("multipleChoiceValue", 0);
 
             MenuHelper = new();
             DeclareMenuTabs(MenuHelper);
+        }
+
+        [HarmonyPatch("Il2CppInterop.HarmonySupport.Il2CppDetourMethodPatcher", "ReportException")]
+        public static class Patch_Il2CppDetourMethodPatcher
+        {
+            public static bool Prefix(System.Exception ex)
+            {
+                MelonLogger.Error("During invoking native->managed trampoline", ex);
+                return false;
+            }
+        }
+
+        private void LogValues()
+        {
+            Action<string> log = (str) => LoggerInstance.Msg($"\t{str}");
+            LoggerInstance.Msg($"preferences:");
+            log($"enabled: {enabled.Value}");
+            log($"someToggle: {someToggle.Value}");
+            log($"somePercentage: {somePercentage.Value}");
+            log($"buttonPressed: {buttonPressed.Value}");
+            log($"dropDownValue: {dropDownValue.Value}");
+            log($"multipleChoiceValue: {multipleChoiceValue.Value}");
         }
 
         private void DeclareMenuTabs(MenuHelper MenuHelper)
@@ -51,29 +74,21 @@ namespace ExampleMod
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "some-icon.png");
             string imagePath2 = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "n-icon.png");
 
-            MenuHelper.DeclareTab("FirstTab", imagePath);
-            MenuHelper.DeclareTab("SecondTab", imagePath2);
+            MenuHelper.DeclareTab("Config Tab", imagePath);
+            MenuHelper.DeclareTab("Empty Tab", imagePath2);
 
-            MenuHelper.AddElementToTab("FirstTab", new TickBox("TickBox", false, (value) => LoggerInstance.Msg($"TickBox {value}")));
-            MenuHelper.AddElementToTab("FirstTab", new TickBox("TickBox2", false, (value) => LoggerInstance.Msg($"TickBox2 {value}")));
-            MenuHelper.AddElementToTab("FirstTab", new LabeledButton("LabeledButton", "x", () => LoggerInstance.Msg($"LabeledButton")));
-            MenuHelper.AddElementToTab("FirstTab", new Slider("Slider", 1f, (value) => LoggerInstance.Msg($"Slider {value}")));
-            MenuHelper.AddElementToTab("FirstTab", new DropDown("DropDown", new() { "one", "two", "three" }, 0, (value) => LoggerInstance.Msg($"DropDownList {value}")));
-            Action<int> action = (value) => LoggerInstance.Msg($"MultipleChoice {value}");
-            MenuHelper.AddElementToTab("FirstTab", new MultipleChoice("DropDown", new() { "one", "two", "three" }, new() { () => action(0), () => action(1), () => action(2) }, 0));
+            MenuHelper.AddElementToTab("Config Tab", new TickBox("enabled", () => enabled.Value, (value) => enabled.Value = value));
+            MenuHelper.AddElementToTab("Config Tab", new TickBox("someToggle", () => someToggle.Value, (value) => someToggle.Value = value));
+            MenuHelper.AddElementToTab("Config Tab", new LabeledButton("LabeledButton", "log values", () => LogValues()));
+            MenuHelper.AddElementToTab("Config Tab", new Slider("Slider", () => somePercentage.Value, (value) => somePercentage.Value = value));
+            MenuHelper.AddElementToTab("Config Tab", new DropDown("DropDown", new() { "one", "two", "three" }, () => dropDownValue.Value, (value) => dropDownValue.Value = value));
+            Action<int> action = (value) => multipleChoiceValue.Value = value;
+            MenuHelper.AddElementToTab("Config Tab", new MultipleChoice("DropDown", new() { "one", "two", "three" }, new() { () => action(0), () => action(1), () => action(2) }, () => multipleChoiceValue.Value));
         }
 
         [HarmonyPatch(typeof(OptionsController))]
         class Example_OptionsController_Patch2
         {
-
-            [HarmonyPatch(nameof(OptionsController.GenerateNavigation))]
-            [HarmonyPostfix]
-            static void GenerateNavigation_Postfix(OptionsController __instance) => MenuHelper.OnGenerateNavigation(__instance);
-
-            [HarmonyPatch(nameof(OptionsController.AddTabs))]
-            [HarmonyPostfix]
-            static void AddTabs_Postfix(OptionsController __instance) => MenuHelper.OnAddTabs(__instance);
 
             [HarmonyPatch(nameof(OptionsController.Initialize))]
             [HarmonyPrefix]
@@ -87,9 +102,6 @@ namespace ExampleMod
             [HarmonyPrefix]
             static bool BuildPage_Prefix(OptionsController __instance, OptionsTabType type) => MenuHelper.OnBuildPage(__instance, type);
 
-            [HarmonyPatch(nameof(OptionsController.GetTabName))]
-            [HarmonyPostfix]
-            static void GetTabName_Postfix(OptionsTabType t, ref string __result) => __result = MenuHelper.OnGetTabName(t) ?? __result;
         }
 
         [HarmonyPatch(typeof(OptionsController))]
@@ -621,14 +633,6 @@ namespace ExampleMod
             {
                 Melon<ExampleMod>.Logger.Msg($"HideAdsButtons_Prefix");
             }
-
-
-            //[HarmonyPatch(MethodType.Constructor, new Type[] { typeof(IntPtr) })]
-            //[HarmonyPrefix]
-            //static void OptionsController_Prefix(OptionsController __instance)
-            //{
-            //    Melon<ExampleMod>.Logger.Msg($"public OptionsController_Prefix");
-            //}
 
 
             [HarmonyPatch(nameof(OptionsController.Construct))]
