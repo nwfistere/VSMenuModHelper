@@ -1,6 +1,4 @@
 ﻿using HarmonyLib;
-using Il2CppSystem.Collections.Generic;
-using Il2CppSystem.Runtime.Remoting.Messaging;
 using Il2CppVampireSurvivors.UI;
 using MelonLoader;
 using System;
@@ -23,7 +21,7 @@ namespace ExampleMod
 
     public class ExampleMod : MelonMod
     {
-        private MelonPreferences_Category preferences;
+        private MelonPreferences_Category? preferences;
         private static MelonPreferences_Entry<bool> enabled;
         private static MelonPreferences_Entry<bool> someToggle;
         private static MelonPreferences_Entry<float> somePercentage;
@@ -72,7 +70,7 @@ namespace ExampleMod
         private void DeclareMenuTabs(MenuHelper MenuHelper)
         {
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "some-icon.png");
-            string imagePath2 = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "n-icon.png");
+            Uri imagePath2 = new("https://github.com/nwfistere/VSMenuModHelper/blob/main/examples/resources/example/game-controller.png");
 
             MenuHelper.DeclareTab("Config Tab", imagePath);
             MenuHelper.DeclareTab("Empty Tab", imagePath2);
@@ -90,6 +88,16 @@ namespace ExampleMod
         [HarmonyPatch(typeof(OptionsController))]
         class Example_OptionsController_Patch
         {
+            // Used for advanced GetTabSprite_Postfix
+            static Sprite AlterSpriteHelper(Sprite sprite)
+            {
+                if (sprite.name == "Empty Tab")
+                {
+                    sprite.texture.filterMode = FilterMode.Point;
+                }
+                return sprite;
+            }
+
             [HarmonyPatch(nameof(OptionsController.Construct))]
             [HarmonyPrefix]
             static void Construct_Prefix() => MenuHelper.Construct_Prefix();
@@ -98,9 +106,15 @@ namespace ExampleMod
             [HarmonyPrefix]
             static void Initialize_Prefix(OptionsController __instance) => MenuHelper.Initialize_Prefix(__instance);
 
+            // Basic usage:
+            //[HarmonyPatch(nameof(OptionsController.GetTabSprite))]
+            //[HarmonyPostfix]
+            //static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = MenuHelper.OnGetTabSprite(t) ?? __result;
+
+            // Advanced usage to alter the sprite prior to sending to OptionsController
             [HarmonyPatch(nameof(OptionsController.GetTabSprite))]
             [HarmonyPostfix]
-            static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = MenuHelper.OnGetTabSprite(t) ?? __result;
+            static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = MenuHelper.OnGetTabSprite(t, AlterSpriteHelper) ?? __result;
 
             [HarmonyPatch(nameof(OptionsController.BuildPage))]
             [HarmonyPrefix]

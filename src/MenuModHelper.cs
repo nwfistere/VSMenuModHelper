@@ -10,7 +10,7 @@ namespace VSMenuHelper
 
     public class MenuHelper
     {
-        private List<Tab> createdTabs;
+        private readonly List<Tab> createdTabs;
         public MenuHelper()
         {
             createdTabs = new();
@@ -21,6 +21,13 @@ namespace VSMenuHelper
             if (createdTabs.Where((tab) => tab.TabName == identifier).Any())
                 throw new ArgumentException("Object with that identifier already exists.");
             createdTabs.Add(new(identifier, spritePath));
+        }
+
+        public void DeclareTab(string identifier, Uri spriteUri)
+        {
+            if (createdTabs.Where((tab) => tab.TabName == identifier).Any())
+                throw new ArgumentException("Object with that identifier already exists.");
+            createdTabs.Add(new(identifier, spriteUri));
         }
 
         public void AddElementToTab(string identifier, UIElement element)
@@ -45,6 +52,15 @@ namespace VSMenuHelper
 
         public Sprite? OnGetTabSprite(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Select((tab) => tab.GetSprite()).FirstOrDefault(null as Sprite);
 
+        public Sprite? OnGetTabSprite(OptionsTabType type, Func<Sprite, Sprite> alterSprite)
+        {
+            Sprite? sprite = createdTabs.Where((tab) => tab.GetTabType() == type).Select((tab) => tab.GetSprite()).FirstOrDefault(null as Sprite);
+            if (sprite != null)
+                sprite = alterSprite(sprite);
+            return sprite;
+        } 
+
+
         public string? OnGetTabName(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Select((pair) => pair.TabName).FirstOrDefault(null as string);
 
         public bool OurTab(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Any();
@@ -54,17 +70,27 @@ namespace VSMenuHelper
 
         public string TabName { get; set; }
         private static OptionsTabType MinTypeValue = Enum.GetValues<OptionsController.OptionsTabType>().Max() + 1;
-        private OptionsTabType TabType;
-        private string TabButtonSpritePath;
+        private readonly OptionsTabType TabType;
+        private readonly string? TabButtonSpritePath;
+        private readonly Uri? TabButtonSpriteUri;
         private bool alreadyInit = false;
-        private List<UIElement> elements;
+        private readonly List<UIElement> elements;
 
-        public Tab(string name, string spritePath)
+        private Tab(string name)
         {
             TabName = name;
-            TabButtonSpritePath = spritePath;
             elements = new();
             TabType = MinTypeValue++;
+        }
+
+        public Tab(string name, string spritePath) : this(name)
+        {
+            TabButtonSpritePath = spritePath;
+        }
+
+        public Tab(string name, Uri spriteUri) : this(name)
+        {
+            TabButtonSpriteUri = spriteUri;
         }
 
         public OptionsTabType GetTabType() => TabType;
@@ -80,7 +106,19 @@ namespace VSMenuHelper
 
         public Sprite GetSprite()
         {
-            return SpriteImporter.LoadSprite(TabButtonSpritePath);
+            if (TabButtonSpritePath != null)
+            {
+                Sprite sprite =  SpriteImporter.LoadSprite(TabButtonSpritePath);
+                sprite.name = TabName;
+                return sprite;
+            }
+            else if (TabButtonSpriteUri != null)
+            {
+                Sprite sprite = SpriteImporter.LoadSprite(TabButtonSpriteUri);
+                sprite.name = TabName;
+                return sprite;
+            }
+            throw new InvalidOperationException("Sprite path and uri are both null, one must be set.");
         }
 
         public void Reset() => alreadyInit = false;

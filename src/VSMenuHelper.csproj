@@ -15,6 +15,9 @@
     <Reference Include="Il2Cppmscorlib">
       <HintPath>D:\SteamLibrary\steamapps\common\Vampire Survivors\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
     </Reference>
+    <Reference Include="Il2CppSystem">
+      <HintPath>D:\SteamLibrary\steamapps\common\Vampire Survivors\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll</HintPath>
+    </Reference>
     <Reference Include="Il2CppVampireSurvivors.Runtime">
       <HintPath>D:\SteamLibrary\steamapps\common\Vampire Survivors\MelonLoader\Il2CppAssemblies\Il2CppVampireSurvivors.Runtime.dll</HintPath>
     </Reference>
@@ -35,6 +38,12 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>D:\SteamLibrary\steamapps\common\Vampire Survivors\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>D:\SteamLibrary\steamapps\common\Vampire Survivors\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+      <HintPath>D:\SteamLibrary\steamapps\common\Vampire Survivors\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -11,3 +11,5 @@ There are a couple requirements when consuming MenuHelper.
 1. Install example mod and VSMenuHelper library to the [Vampire Survivors]/Mods directory
 2. Copy the contents of the ./resources/example directory to [Vampire Survivors]/resources/example
 
+## Attributions
+<a href="https://www.flaticon.com/free-icons/game-controller" title="game controller icons">Game controller icons created by Freepik - Flaticon</a>
