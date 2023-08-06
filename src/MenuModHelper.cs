@@ -10,7 +10,7 @@ namespace VSMenuHelper
 
     public class MenuHelper
     {
-        private List<Tab> createdTabs;
+        private readonly List<Tab> createdTabs;
         public MenuHelper()
         {
             createdTabs = new();
@@ -61,11 +61,11 @@ namespace VSMenuHelper
 
         public string TabName { get; set; }
         private static OptionsTabType MinTypeValue = Enum.GetValues<OptionsController.OptionsTabType>().Max() + 1;
-        private OptionsTabType TabType;
-        private string? TabButtonSpritePath;
-        private Uri? TabButtonSpriteUri;
+        private readonly OptionsTabType TabType;
+        private readonly string? TabButtonSpritePath;
+        private readonly Uri? TabButtonSpriteUri;
         private bool alreadyInit = false;
-        private List<UIElement> elements;
+        private readonly List<UIElement> elements;
 
         private Tab(string name)
         {

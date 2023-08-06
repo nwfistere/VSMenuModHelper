@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using System;
-using System.IO;
-using System.Collections;
-using UnityEngine.Networking;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
 
 namespace VSMenuHelper
 {
@@ -28,7 +26,7 @@ namespace VSMenuHelper
             return texture;
         }
 
-        private static Dictionary<Uri, TextureDownloader> downloadCache = new();
+        private static readonly Dictionary<Uri, TextureDownloader> downloadCache = new();
 
         public static Texture2D LoadTexture(Uri textureUri)
         {
@@ -40,7 +38,7 @@ namespace VSMenuHelper
                 textureDownloader = downloadCache[textureUri];
             else
             {
-                textureDownloader = new(textureUri, (bytes) => { }, (str) => throw new Exception(str));
+                textureDownloader = new(textureUri);
             }
 
             imageBytes = textureDownloader.GetBytes();
@@ -48,7 +46,6 @@ namespace VSMenuHelper
 
             if (!ImageConversion.LoadImage(texture, imageBytes))
                 throw new Exception("ImageConversion.LoadImage failed");
-
             downloadCache[textureUri] = textureDownloader;
 
             return texture;

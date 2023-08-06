@@ -1,6 +1,4 @@
 ﻿using HarmonyLib;
-using Il2CppSystem.Collections.Generic;
-using Il2CppSystem.Runtime.Remoting.Messaging;
 using Il2CppVampireSurvivors.UI;
 using MelonLoader;
 using System;
@@ -23,7 +21,7 @@ namespace ExampleMod
 
     public class ExampleMod : MelonMod
     {
-        private MelonPreferences_Category preferences;
+        private MelonPreferences_Category? preferences;
         private static MelonPreferences_Entry<bool> enabled;
         private static MelonPreferences_Entry<bool> someToggle;
         private static MelonPreferences_Entry<float> somePercentage;
@@ -72,7 +70,7 @@ namespace ExampleMod
         private void DeclareMenuTabs(MenuHelper MenuHelper)
         {
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "some-icon.png");
-            Uri imagePath2 = new Uri("https://fastly.picsum.photos/id/799/30/30.jpg?hmac=FcHj-TNcGxGgCoENZ6Y99c6TWDJrbt0vi8QC5GnjY40");
+            Uri imagePath2 = new("https://fastly.picsum.photos/id/799/30/30.jpg?hmac=FcHj-TNcGxGgCoENZ6Y99c6TWDJrbt0vi8QC5GnjY40");
 
             MenuHelper.DeclareTab("Config Tab", imagePath);
             MenuHelper.DeclareTab("Empty Tab", imagePath2);
