@@ -72,7 +72,7 @@ namespace ExampleMod
         private void DeclareMenuTabs(MenuHelper MenuHelper)
         {
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "some-icon.png");
-            string imagePath2 = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "n-icon.png");
+            Uri imagePath2 = new Uri("https://fastly.picsum.photos/id/799/30/30.jpg?hmac=FcHj-TNcGxGgCoENZ6Y99c6TWDJrbt0vi8QC5GnjY40");
 
             MenuHelper.DeclareTab("Config Tab", imagePath);
             MenuHelper.DeclareTab("Empty Tab", imagePath2);

@@ -23,6 +23,13 @@ namespace VSMenuHelper
             createdTabs.Add(new(identifier, spritePath));
         }
 
+        public void DeclareTab(string identifier, Uri spriteUri)
+        {
+            if (createdTabs.Where((tab) => tab.TabName == identifier).Any())
+                throw new ArgumentException("Object with that identifier already exists.");
+            createdTabs.Add(new(identifier, spriteUri));
+        }
+
         public void AddElementToTab(string identifier, UIElement element)
         {
             createdTabs.First((tab) => tab.TabName == identifier).AddElement(element);
@@ -55,16 +62,26 @@ namespace VSMenuHelper
         public string TabName { get; set; }
         private static OptionsTabType MinTypeValue = Enum.GetValues<OptionsController.OptionsTabType>().Max() + 1;
         private OptionsTabType TabType;
-        private string TabButtonSpritePath;
+        private string? TabButtonSpritePath;
+        private Uri? TabButtonSpriteUri;
         private bool alreadyInit = false;
         private List<UIElement> elements;
 
-        public Tab(string name, string spritePath)
+        private Tab(string name)
         {
             TabName = name;
-            TabButtonSpritePath = spritePath;
             elements = new();
             TabType = MinTypeValue++;
+        }
+
+        public Tab(string name, string spritePath) : this(name)
+        {
+            TabButtonSpritePath = spritePath;
+        }
+
+        public Tab(string name, Uri spriteUri) : this(name)
+        {
+            TabButtonSpriteUri = spriteUri;
         }
 
         public OptionsTabType GetTabType() => TabType;
@@ -80,7 +97,15 @@ namespace VSMenuHelper
 
         public Sprite GetSprite()
         {
-            return SpriteImporter.LoadSprite(TabButtonSpritePath);
+            if (TabButtonSpritePath != null)
+            {
+                return SpriteImporter.LoadSprite(TabButtonSpritePath);
+            }
+            else if (TabButtonSpriteUri != null)
+            {
+                return SpriteImporter.LoadSprite(TabButtonSpriteUri);
+            }
+            throw new InvalidOperationException("Sprite path and uri are both null, one must be set.");
         }
 
         public void Reset() => alreadyInit = false;
