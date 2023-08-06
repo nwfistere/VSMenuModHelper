@@ -88,6 +88,16 @@ namespace ExampleMod
         [HarmonyPatch(typeof(OptionsController))]
         class Example_OptionsController_Patch
         {
+            // Used for advanced GetTabSprite_Postfix
+            static Sprite AlterSpriteHelper(Sprite sprite)
+            {
+                if (sprite.name == "Empty Tab")
+                {
+                    sprite.texture.filterMode = FilterMode.Point;
+                }
+                return sprite;
+            }
+
             [HarmonyPatch(nameof(OptionsController.Construct))]
             [HarmonyPrefix]
             static void Construct_Prefix() => MenuHelper.Construct_Prefix();
@@ -96,9 +106,15 @@ namespace ExampleMod
             [HarmonyPrefix]
             static void Initialize_Prefix(OptionsController __instance) => MenuHelper.Initialize_Prefix(__instance);
 
+            // Basic usage:
+            //[HarmonyPatch(nameof(OptionsController.GetTabSprite))]
+            //[HarmonyPostfix]
+            //static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = MenuHelper.OnGetTabSprite(t) ?? __result;
+
+            // Advanced usage to alter the sprite prior to sending to OptionsController
             [HarmonyPatch(nameof(OptionsController.GetTabSprite))]
             [HarmonyPostfix]
-            static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = MenuHelper.OnGetTabSprite(t) ?? __result;
+            static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = MenuHelper.OnGetTabSprite(t, AlterSpriteHelper) ?? __result;
 
             [HarmonyPatch(nameof(OptionsController.BuildPage))]
             [HarmonyPrefix]

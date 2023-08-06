@@ -52,6 +52,15 @@ namespace VSMenuHelper
 
         public Sprite? OnGetTabSprite(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Select((tab) => tab.GetSprite()).FirstOrDefault(null as Sprite);
 
+        public Sprite? OnGetTabSprite(OptionsTabType type, Func<Sprite, Sprite> alterSprite)
+        {
+            Sprite? sprite = createdTabs.Where((tab) => tab.GetTabType() == type).Select((tab) => tab.GetSprite()).FirstOrDefault(null as Sprite);
+            if (sprite != null)
+                sprite = alterSprite(sprite);
+            return sprite;
+        } 
+
+
         public string? OnGetTabName(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Select((pair) => pair.TabName).FirstOrDefault(null as string);
 
         public bool OurTab(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Any();
@@ -99,11 +108,15 @@ namespace VSMenuHelper
         {
             if (TabButtonSpritePath != null)
             {
-                return SpriteImporter.LoadSprite(TabButtonSpritePath);
+                Sprite sprite =  SpriteImporter.LoadSprite(TabButtonSpritePath);
+                sprite.name = TabName;
+                return sprite;
             }
             else if (TabButtonSpriteUri != null)
             {
-                return SpriteImporter.LoadSprite(TabButtonSpriteUri);
+                Sprite sprite = SpriteImporter.LoadSprite(TabButtonSpriteUri);
+                sprite.name = TabName;
+                return sprite;
             }
             throw new InvalidOperationException("Sprite path and uri are both null, one must be set.");
         }
