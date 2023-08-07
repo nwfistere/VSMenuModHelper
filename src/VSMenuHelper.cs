@@ -18,7 +18,7 @@ namespace VSMenuModHelper
         public const string Description = "A mod to enable altering Vampire Survivors menus.";
         public const string Author = "Nick";
         public const string Company = "Nick";
-        public const string Version = "1.1.0";
+        public const string Version = "1.2.0";
         public const string Download = "https://github.com/nwfistere/VSMenuModHelper";
     }
     public class VSMenuHelper : MelonMod
