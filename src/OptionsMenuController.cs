@@ -5,13 +5,12 @@ using System.Linq;
 using UnityEngine;
 using static Il2CppVampireSurvivors.UI.OptionsController;
 
-namespace VSMenuHelper
+namespace VSMenuModHelper
 {
-
-    public class MenuHelper
+    public class OptionsMenuController
     {
         private readonly List<Tab> createdTabs;
-        public MenuHelper()
+        public OptionsMenuController()
         {
             createdTabs = new();
         }
@@ -46,20 +45,22 @@ namespace VSMenuHelper
                 return true;
             Tab tab = createdTabs.First((tab) => tab.GetTabType() == type);
             tab.GetElements().ForEach((element) => element.GetElement().Invoke(controller));
-            controller._Title.text = tab.TabName;
+
             return false;
         }
 
-        public Sprite? OnGetTabSprite(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Select((tab) => tab.GetSprite()).FirstOrDefault(null as Sprite);
-
-        public Sprite? OnGetTabSprite(OptionsTabType type, Func<Sprite, Sprite> alterSprite)
+        public Sprite? OnGetTabSprite(OptionsTabType type, Func<Sprite, Sprite>? alterSprite)
         {
             Sprite? sprite = createdTabs.Where((tab) => tab.GetTabType() == type).Select((tab) => tab.GetSprite()).FirstOrDefault(null as Sprite);
-            if (sprite != null)
+            if (sprite != null && alterSprite != null)
                 sprite = alterSprite(sprite);
             return sprite;
-        } 
+        }
 
+        internal string? getTabNameFromType(OptionsTabType type)
+        {
+            return createdTabs.Where((tab) => tab.GetTabType() == type).Select((tab) => tab.TabName).FirstOrDefault(null as string);
+        }
 
         public string? OnGetTabName(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Select((pair) => pair.TabName).FirstOrDefault(null as string);
 

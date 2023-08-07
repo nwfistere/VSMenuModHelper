@@ -4,7 +4,7 @@ using MelonLoader;
 using System;
 using System.IO;
 using UnityEngine;
-using VSMenuHelper;
+using VSMenuModHelper;
 using static Il2CppVampireSurvivors.UI.OptionsController;
 
 namespace ExampleMod
@@ -16,7 +16,7 @@ namespace ExampleMod
         public const string Author = "Nick";
         public const string Company = "Nick";
         public const string Version = "1.0.0";
-        public const string Download = "https://github.com/nwfistere/VSMenuModHelper";
+        public const string Download = "https://github.com/nwfistere/VSMenuModHelper/tree/main/examples";
     }
 
     public class ExampleMod : MelonMod
@@ -29,7 +29,7 @@ namespace ExampleMod
         private static MelonPreferences_Entry<int> dropDownValue;
         private static MelonPreferences_Entry<int> multipleChoiceValue;
 
-        private static MenuHelper MenuHelper;
+        private static OptionsMenuController MenuHelper;
 
         public override void OnInitializeMelon()
         {
@@ -42,7 +42,13 @@ namespace ExampleMod
             multipleChoiceValue = preferences.CreateEntry("multipleChoiceValue", 0);
 
             MenuHelper = new();
+            
             DeclareMenuTabs(MenuHelper);
+            
+
+            
+            VSMenuHelper.Instance.DeclareOptionsTab("Third Tab", Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "n-icon.png"));
+            VSMenuHelper.Instance.AddElementToTab("Third Tab", new Title("Third best tab!"));
         }
 
         [HarmonyPatch("Il2CppInterop.HarmonySupport.Il2CppDetourMethodPatcher", "ReportException")]
@@ -67,7 +73,7 @@ namespace ExampleMod
             log($"multipleChoiceValue: {multipleChoiceValue.Value}");
         }
 
-        private void DeclareMenuTabs(MenuHelper MenuHelper)
+        private void DeclareMenuTabs(OptionsMenuController MenuHelper)
         {
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "some-icon.png");
             Uri imagePath2 = new("https://github.com/nwfistere/VSMenuModHelper/blob/main/examples/resources/example/game-controller.png?raw=true");

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine.Networking;
 
-namespace VSMenuHelper
+namespace VSMenuModHelper
 {
     public class TextureDownloader
     {
