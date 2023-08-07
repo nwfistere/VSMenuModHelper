@@ -56,16 +56,16 @@ namespace OptionalExample
 
             Action<int> action = (value) => category.Set("multipleChoiceValue", value);
 
-            vsMenuHelper.DeclareOptionsTab("Config Tab", imagePath);
+            vsMenuHelper.DeclareOptionsTab("Optional Config Tab", imagePath);
 
-            vsMenuHelper.AddElementToTab("Config Tab", new Title("Optional Config Tab"));
-            vsMenuHelper.AddElementToTab("Config Tab", new TickBox("enabled", () => category.Get<bool>("enabled"), (value) => category.Set("enabled", value)));
-            vsMenuHelper.AddElementToTab("Config Tab", new TickBox("someToggle", () => category.Get<bool>("someToggle"), (value) => category.Set("someToggle", value)));
-            vsMenuHelper.AddElementToTab("Config Tab", new LabeledButton("LabeledButton", "log values", () => LogValues()));
-            vsMenuHelper.AddElementToTab("Config Tab", new Slider("Slider", () => category.Get<float>("somePercentage"), (value) => category.Set("somePercentage", value)));
-            vsMenuHelper.AddElementToTab("Config Tab", new DropDown("DropDown", new() { "one", "two", "three" }, () => category.Get<int>("dropDownValue"), (value) => category.Set("dropDownValue", value)));
-            vsMenuHelper.AddElementToTab("Config Tab", new MultipleChoice("MultipleChoice", new() { "one", "two", "three" }, new() { () => action(0), () => action(1), () => action(2) }, () => category.Get<int>("multipleChoiceValue")));
-            vsMenuHelper.AddElementToTab("Config Tab", new LabeledButton("", "save", () => category.SaveToFile()));
+            vsMenuHelper.AddElementToTab("Optional Config Tab", new Title("Optional Config Tab"));
+            vsMenuHelper.AddElementToTab("Optional Config Tab", new TickBox("enabled", () => category.Get<bool>("enabled"), (value) => category.Set("enabled", value)));
+            vsMenuHelper.AddElementToTab("Optional Config Tab", new TickBox("someToggle", () => category.Get<bool>("someToggle"), (value) => category.Set("someToggle", value)));
+            vsMenuHelper.AddElementToTab("Optional Config Tab", new LabeledButton("LabeledButton", "log values", () => LogValues()));
+            vsMenuHelper.AddElementToTab("Optional Config Tab", new Slider("Slider", () => category.Get<float>("somePercentage"), (value) => category.Set("somePercentage", value)));
+            vsMenuHelper.AddElementToTab("Optional Config Tab", new DropDown("DropDown", new() { "one", "two", "three" }, () => category.Get<int>("dropDownValue"), (value) => category.Set("dropDownValue", value)));
+            vsMenuHelper.AddElementToTab("Optional Config Tab", new MultipleChoice("MultipleChoice", new() { "one", "two", "three" }, new() { () => action(0), () => action(1), () => action(2) }, () => category.Get<int>("multipleChoiceValue")));
+            vsMenuHelper.AddElementToTab("Optional Config Tab", new LabeledButton("", "save", () => category.SaveToFile()));
 
         }
     }

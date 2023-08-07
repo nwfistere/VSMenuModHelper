@@ -49,8 +49,6 @@ namespace OptionalExample
                 else
                     LoggerInstance.Warning("Not Found - VSMenuModHelperAssembly");
             }
-            //ReadOnlyCollection<MelonAssembly> assemblies = MelonLoader.MelonAssembly.LoadedAssemblies;
-            //assemblies.AsEnumerable().Select()
         }
 
         public override void OnLateInitializeMelon()
