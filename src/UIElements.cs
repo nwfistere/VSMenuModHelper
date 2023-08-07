@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace VSMenuHelper
+namespace VSMenuModHelper
 {
     public abstract class UIElement
     {
@@ -109,5 +109,12 @@ namespace VSMenuHelper
 
             return (controller) => controller.AddMultipleChoice(Label, Il2Labels, Il2Actions, GetterDelegate(), IsLocalizationTerm);
         }
+    }
+
+    public class Title : UIElement
+    {
+        public Title(string title) : base(title, false) { }
+
+        public override Action<OptionsController> GetElement() => (controller) => controller._Title.text = this.Label;
     }
 }
