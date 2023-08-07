@@ -29,7 +29,7 @@ namespace VSMenuModHelper
         private readonly OptionsMenuController optionsMenuController;
         private readonly Dictionary<string, List<Func<Sprite, Sprite>>> spriteModifiers;
 
-        public VSMenuHelper() : base()
+        private VSMenuHelper() : base()
         {
             optionsMenuController = new();
             spriteModifiers = new();

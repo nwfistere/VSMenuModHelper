@@ -16,7 +16,7 @@ namespace ExampleMod
         public const string Author = "Nick";
         public const string Company = "Nick";
         public const string Version = "1.0.0";
-        public const string Download = "https://github.com/nwfistere/VSMenuModHelper/tree/main/examples";
+        public const string Download = "https://github.com/nwfistere/VSMenuModHelper/tree/main/examples/BasicExample";
     }
 
     public class ExampleMod : MelonMod
@@ -76,18 +76,19 @@ namespace ExampleMod
         private void DeclareMenuTabs(OptionsMenuController MenuHelper)
         {
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "some-icon.png");
-            Uri imagePath2 = new("https://github.com/nwfistere/VSMenuModHelper/blob/main/examples/resources/example/game-controller.png?raw=true");
+            Uri imageUrl = new("https://github.com/nwfistere/VSMenuModHelper/blob/main/examples/resources/example/game-controller.png?raw=true");
 
             MenuHelper.DeclareTab("Config Tab", imagePath);
-            MenuHelper.DeclareTab("Empty Tab", imagePath2);
+            MenuHelper.DeclareTab("Empty Tab", imageUrl);
 
+            MenuHelper.AddElementToTab("Config Tab", new Title("Config Tab"));
             MenuHelper.AddElementToTab("Config Tab", new TickBox("enabled", () => enabled.Value, (value) => enabled.Value = value));
             MenuHelper.AddElementToTab("Config Tab", new TickBox("someToggle", () => someToggle.Value, (value) => someToggle.Value = value));
             MenuHelper.AddElementToTab("Config Tab", new LabeledButton("LabeledButton", "log values", () => LogValues()));
             MenuHelper.AddElementToTab("Config Tab", new Slider("Slider", () => somePercentage.Value, (value) => somePercentage.Value = value));
             MenuHelper.AddElementToTab("Config Tab", new DropDown("DropDown", new() { "one", "two", "three" }, () => dropDownValue.Value, (value) => dropDownValue.Value = value));
             Action<int> action = (value) => multipleChoiceValue.Value = value;
-            MenuHelper.AddElementToTab("Config Tab", new MultipleChoice("DropDown", new() { "one", "two", "three" }, new() { () => action(0), () => action(1), () => action(2) }, () => multipleChoiceValue.Value));
+            MenuHelper.AddElementToTab("Config Tab", new MultipleChoice("MultipleChoice", new() { "one", "two", "three" }, new() { () => action(0), () => action(1), () => action(2) }, () => multipleChoiceValue.Value));
         }
 
         // Must be added to consume the library. This adds the Tabs to the game.
