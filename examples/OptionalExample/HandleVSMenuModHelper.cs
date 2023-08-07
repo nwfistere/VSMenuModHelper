@@ -53,7 +53,6 @@ namespace OptionalExample
             bool enabled = category.GetEntry<bool>("enabled").Value;
 
             string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "resources", "example", "some-icon.png");
-            Uri imagePath2 = new("https://github.com/nwfistere/VSMenuModHelper/blob/main/examples/resources/example/game-controller.png?raw=true");
 
             Action<int> action = (value) => category.Set("multipleChoiceValue", value);
 
