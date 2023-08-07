@@ -14,7 +14,6 @@ using System.Runtime.InteropServices;
 
 [assembly: MelonInfo(typeof(VSMenuHelper), ModInfo.Name, ModInfo.Version, ModInfo.Author, ModInfo.Download)]
 [assembly: MelonGame("poncle", "VampireSurvivors")]
-[assembly: MelonOptionalDependencies("VSMenuHelper")]
 
 [assembly: ComVisible(false)]
 
