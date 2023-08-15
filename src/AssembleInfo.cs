@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion(ModInfo.Version)]
 
 [assembly: MelonInfo(typeof(VSMenuHelper), ModInfo.Name, ModInfo.Version, ModInfo.Author, ModInfo.Download)]
-[assembly: MelonGame("poncle", "VampireSurvivors")]
+[assembly: MelonGame("poncle", "Vampire Survivors")]
 
 [assembly: ComVisible(false)]
 

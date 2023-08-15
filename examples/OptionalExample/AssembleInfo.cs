@@ -16,7 +16,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion(ModInfo.Version)]
 
 [assembly: MelonInfo(typeof(OptionalExample.OptionalExample), ModInfo.Name, ModInfo.Version, ModInfo.Author, ModInfo.Download)]
-[assembly: MelonGame("poncle", "VampireSurvivors")]
+[assembly: MelonGame("poncle", "Vampire Survivors")]
 [assembly: MelonOptionalDependencies("VSMenuModHelper")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

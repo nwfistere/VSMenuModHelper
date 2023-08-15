@@ -16,7 +16,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion(ModInfo.Version)]
 
 [assembly: MelonInfo(typeof(ExampleMod.ExampleMod), ModInfo.Name, ModInfo.Version, ModInfo.Author, ModInfo.Download)]
-[assembly: MelonGame("poncle", "VampireSurvivors")]
+[assembly: MelonGame("poncle", "Vampire Survivors")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
