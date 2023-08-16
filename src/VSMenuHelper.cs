@@ -110,8 +110,7 @@ namespace VSMenuModHelper
         class OptionsController_Patch2
         {
 
-            public static RectTransform _content;
-            public static GameObject tabObject;
+            public static RectTransform rectTransform;
 
             static RectTransform CreateScrollViewContent(RectTransform viewportRectTransform)
             {
@@ -124,6 +123,7 @@ namespace VSMenuModHelper
                 layoutGroup.childControlHeight = false;
                 layoutGroup.childControlWidth = false;
                 layoutGroup.spacing = 55;
+                layoutGroup.padding = new RectOffset(0, 0, 20, 0);
 
                 RectTransform contentRectTransform = contentObject.GetComponent<RectTransform>();
                 contentRectTransform.SetParent(viewportRectTransform, false);
@@ -143,19 +143,14 @@ namespace VSMenuModHelper
                 Material material = new Material(Shader.Find("UI/Default"));
                 Material unmaterial = new Material(Shader.Find("UI/Default"));
                 GameObject viewportObject = new GameObject("Viewport");
-                viewportObject.AddComponent<RectTransform>(); // Required for layout control.
+                viewportObject.AddComponent<RectTransform>();
 
                 RectTransform viewportRectTransform = viewportObject.GetComponent<RectTransform>();
                 viewportRectTransform.SetParent(scrollViewObject.GetComponent<RectTransform>(), false);
-
                 viewportRectTransform.anchorMin = new Vector2(0, 0.02f);
                 viewportRectTransform.anchorMax = Vector2.one;
                 viewportRectTransform.sizeDelta = Vector2.zero;
                 viewportRectTransform.anchoredPosition = new Vector2(0, -10);
-
-                Sprite[] allSprites = Resources.FindObjectsOfTypeAll<Sprite>();
-
-                Sprite sprite = allSprites.Where(s => s.name == "UIMask").FirstOrDefault(null as Sprite);
 
                 Mask mask = viewportObject.AddComponent<Mask>();
                 mask.showMaskGraphic = false;
@@ -163,98 +158,20 @@ namespace VSMenuModHelper
                 Image image = viewportObject.AddComponent<Image>();
                 image.m_Type = Image.Type.Sliced;
                 image.material = material;
-                //image.isMaskingGraphic = true;
-                image.sprite = sprite;
+                image.sprite = Resources.FindObjectsOfTypeAll<Sprite>().Where(s => s.name == "UIMask").FirstOrDefault(null as Sprite);
 
                 mask.m_Graphic = image;
                 mask.m_MaskMaterial = material;
                 mask.m_UnmaskMaterial = unmaterial;
 
-
-                //image.sprite = sprite;
-                //mask.m_MaskMaterial = material;
-                //mask.m_UnmaskMaterial = material;
-
                 return viewportRectTransform;
-            }
-
-            static Scrollbar CreateScrollbar(ScrollRect scrollRect, Scrollbar.Direction direction)
-            {
-                GameObject scrollbarObject = new GameObject("Scrollbar");
-                scrollbarObject.AddComponent<RectTransform>(); // Required for layout control.
-
-                RectTransform scrollbarRectTransform = scrollbarObject.GetComponent<RectTransform>();
-                scrollbarRectTransform.SetParent(scrollRect.transform, false);
-
-                Scrollbar scrollbar = scrollbarObject.AddComponent<Scrollbar>();
-                scrollbar.direction = direction;
-
-                GameObject handleObject = new GameObject("Handle");
-                handleObject.AddComponent<RectTransform>(); // Required for layout control.
-
-                RectTransform handleRectTransform = handleObject.GetComponent<RectTransform>();
-                handleRectTransform.SetParent(scrollbarRectTransform, false);
-
-                scrollbar.handleRect = handleRectTransform;
-
-                return scrollbar;
-            }
-
-            [HarmonyPatch(nameof(OptionsController.Initialize))]
-            [HarmonyPrefix]
-            static void Initialize_Prefix2(OptionsController __instance)
-            {
-                //tabObject = __instance._TabContainer.gameObject;
-                //if (__instance._TabContainer.FindChild("ScrollView") != null)
-                //{
-                //    List<Transform> children = new();
-                //    for (int i = 0; i < _content.childCount; i++)
-                //    {
-                //        children.Add(_content.GetChild(i).transform);
-                //    }
-                //    children.ForEach((child) => child.SetParent(__instance._TabContainer, false));
-                //    GameObject.DestroyImmediate(__instance._TabContainer.FindChild("ScrollView").gameObject);
-                //}
-
-                //if (__instance._TabContainer.FindChild("ScrollView") == null)
-                //{
-                //    GameObject scrollViewObject = new GameObject("ScrollView");
-                //    scrollViewObject.transform.SetParent(tabObject.transform, false);
-
-                //    ScrollRect scrollRect = scrollViewObject.AddComponent<ScrollRect>();
-                //    //scrollRect.verticalScrollbar = CreateScrollbar(scrollRect, Scrollbar.Direction.BottomToTop);
-                //    scrollRect.horizontal = false;
-                //    scrollRect.scrollSensitivity = 100;
-                //    scrollRect.vertical = true;
-                //    scrollRect.viewport = CreateScrollViewViewport(scrollViewObject);
-                //    scrollRect.content = CreateScrollViewContent(scrollRect.viewport);
-
-                //    RectTransform rectTransform = scrollViewObject.GetComponent<RectTransform>();
-                //    rectTransform.anchorMin = Vector2.zero;
-                //    rectTransform.anchorMax = Vector2.one;
-                //    rectTransform.sizeDelta = Vector2.zero;
-                //    rectTransform.anchoredPosition = Vector2.zero;
-
-                //    _content = scrollRect.content;
-                //}
             }
 
             [HarmonyPatch(nameof(OptionsController.BuildPage))]
             [HarmonyPostfix]
             static void BuildPage_Postfix(OptionsController __instance, OptionsTabType type)
             {
-                List<Transform> children = new();
-
-                tabObject = __instance._TabContainer.gameObject;
-                if (__instance._TabContainer.FindChild("ScrollView") != null)
-                {
-                    for (int i = 0; i < _content.childCount; i++)
-                    {
-                        children.Add(_content.GetChild(i).transform);
-                    }
-                    children.ForEach((child) => child.SetParent(__instance._TabContainer, false));
-                    GameObject.DestroyImmediate(__instance._TabContainer.FindChild("ScrollView").gameObject);
-                }
+               GameObject tabObject = __instance._TabContainer.gameObject;
 
                 if (__instance._TabContainer.FindChild("ScrollView") == null)
                 {
@@ -262,7 +179,6 @@ namespace VSMenuModHelper
                     scrollViewObject.transform.SetParent(tabObject.transform, false);
 
                     ScrollRect scrollRect = scrollViewObject.AddComponent<ScrollRect>();
-                    //scrollRect.verticalScrollbar = CreateScrollbar(scrollRect, Scrollbar.Direction.BottomToTop);
                     scrollRect.horizontal = false;
                     scrollRect.scrollSensitivity = 100;
                     scrollRect.vertical = true;
@@ -275,10 +191,10 @@ namespace VSMenuModHelper
                     rectTransform.sizeDelta = Vector2.zero;
                     rectTransform.anchoredPosition = Vector2.zero;
 
-                    _content = scrollRect.content;
+                    rectTransform = scrollRect.content;
                 }
 
-                children = new();
+                List<Transform> children = new();
                 for (int i = 0; i < __instance._TabContainer.childCount; i++)
                 {
                     if (__instance._TabContainer.GetChild(i).name != "ScrollView")
@@ -286,7 +202,7 @@ namespace VSMenuModHelper
                         children.Add(__instance._TabContainer.GetChild(i).transform);
                     }
                 }
-                children.ForEach((child) => child.SetParent(_content, false));
+                children.ForEach((child) => child.SetParent(rectTransform, false));
 
                 if (__instance._TabContainer.GetComponent<VerticalLayoutGroup>() != null)
                 {
