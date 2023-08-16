@@ -1,11 +1,8 @@
-﻿using HarmonyLib;
-using Il2CppVampireSurvivors.UI;
-using MelonLoader;
+﻿using MelonLoader;
 using System;
 using System.IO;
 using UnityEngine;
 using VSMenuModHelper;
-using static Il2CppVampireSurvivors.UI.OptionsController;
 
 namespace ExampleMod
 {
@@ -62,15 +59,16 @@ namespace ExampleMod
 
             VSMenuHelper.Instance.DeclareOptionsTab("Config Tab", imagePath);
             VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 2", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 3", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 4", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 5", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 6", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 7", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 8", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 9", imageUrl);
-            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 10", imageUrl);
+
+            VSMenuHelper.Instance.AddTabSpriteModifier("Empty Tab", (sprite) => {
+                sprite.texture.filterMode = UnityEngine.FilterMode.Point;
+                return sprite;
+            });
+
+            VSMenuHelper.Instance.AddTabSpriteModifier("Empty Tab", (sprite) => {
+                sprite.texture.ReinitializeWithFormatImpl(40, 40, UnityEngine.Experimental.Rendering.GraphicsFormat.R8G8B8A8_SInt, true);
+                return sprite;
+            });
 
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new Title("Config Tab"));
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new TickBox("enabled", () => enabled.Value, (value) => enabled.Value = value));

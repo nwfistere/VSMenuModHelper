@@ -3,10 +3,8 @@ using Il2CppVampireSurvivors.UI;
 using MelonLoader;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using static Il2CppTMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using static Il2CppVampireSurvivors.UI.OptionsController;
 
 namespace VSMenuModHelper
@@ -22,9 +20,7 @@ namespace VSMenuModHelper
     }
     public class VSMenuHelper : MelonMod
     {
-#pragma warning disable CS8618
         public static VSMenuHelper Instance { get; private set; }
-#pragma warning restore CS8618
         private readonly OptionsMenuController optionsMenuController;
         private readonly Dictionary<string, List<Func<Sprite, Sprite>>> spriteModifiers;
 
@@ -33,7 +29,6 @@ namespace VSMenuModHelper
             optionsMenuController = new();
             spriteModifiers = new();
         }
-
         public override void OnEarlyInitializeMelon()
         {
             Instance = this;
@@ -42,35 +37,10 @@ namespace VSMenuModHelper
         public void DeclareOptionsTab(string identifier, string spritePath) => optionsMenuController.DeclareTab(identifier, spritePath);
         public void DeclareOptionsTab(string identifier, Uri spriteUri) => optionsMenuController.DeclareTab(identifier, spriteUri);
         public void AddElementToTab(string identifier, UIElement element) => optionsMenuController.AddElementToTab(identifier, element);
-
-        public void AddTabSpriteModifier(string identifier, Func<Sprite, Sprite> spriteModifier)
-        {
-            List<Func<Sprite, Sprite>> ModifierList = spriteModifiers.GetValueOrDefault(identifier, new());
-            ModifierList.Add(spriteModifier);
-        }
-
-        private Func<Sprite, Sprite>? ModifySprite(OptionsTabType type)
-        {
-            string? identifer = optionsMenuController.getTabNameFromType(type);
-            if (identifer != null)
-            {
-                if (spriteModifiers.ContainsKey(identifer))
-                {
-                    return (sprite) =>
-                    {
-                        foreach (Func<Sprite, Sprite> func in spriteModifiers[identifer])
-                        {
-                            sprite = func(sprite);
-                        }
-                        return sprite;
-                    };
-                }
-            }
-            return null;
-        }
+        public void AddTabSpriteModifier(string identifier, Func<Sprite, Sprite> spriteModifier) => optionsMenuController.AddSpriteModifier(identifier, spriteModifier);
 
         [HarmonyPatch(typeof(OptionsController))]
-        class OptionsController_Patch
+        private class OptionsController_Patch
         {
             [HarmonyPatch(nameof(OptionsController.Construct))]
             [HarmonyPrefix]
@@ -82,7 +52,7 @@ namespace VSMenuModHelper
 
             [HarmonyPatch(nameof(OptionsController.GetTabSprite))]
             [HarmonyPostfix]
-            static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = Instance.optionsMenuController.OnGetTabSprite(t, Instance.ModifySprite(t)) ?? __result;
+            static void GetTabSprite_Postfix(OptionsTabType t, ref Sprite __result) => __result = Instance.optionsMenuController.OnGetTabSprite(t) ?? __result;
 
             [HarmonyPatch(nameof(OptionsController.BuildPage))]
             [HarmonyPrefix]
@@ -106,8 +76,10 @@ namespace VSMenuModHelper
         }
 #endif
 
+        // TODO: Make these methods their own class, probably should be a MonoBehaviour.
+
         [HarmonyPatch(typeof(OptionsController))]
-        class OptionsController_Patch2
+        private class OptionsController_Patch2
         {
 
             public static RectTransform _rectTransform;
@@ -207,13 +179,6 @@ namespace VSMenuModHelper
                 {
                     GameObject.DestroyImmediate(__instance._TabContainer.GetComponent<VerticalLayoutGroup>());
                 }
-            }
-
-            [HarmonyPatch(nameof(OptionsController.GenerateNavigation))]
-            [HarmonyPostfix]
-            static void GenerateNavigation_Postfix(OptionsController __instance)
-            {
-                Melon<VSMenuHelper>.Logger.Msg($"GenerateNavigation_Postfix");
             }
         }
     }

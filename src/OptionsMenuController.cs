@@ -7,7 +7,7 @@ using static Il2CppVampireSurvivors.UI.OptionsController;
 
 namespace VSMenuModHelper
 {
-    public class OptionsMenuController
+    internal class OptionsMenuController
     {
         private readonly List<Tab> createdTabs;
         public OptionsMenuController()
@@ -49,11 +49,9 @@ namespace VSMenuModHelper
             return false;
         }
 
-        public Sprite? OnGetTabSprite(OptionsTabType type, Func<Sprite, Sprite>? alterSprite)
+        public Sprite? OnGetTabSprite(OptionsTabType type)
         {
             Sprite? sprite = createdTabs.Where((tab) => tab.GetTabType() == type).Select((tab) => tab.GetSprite()).FirstOrDefault(null as Sprite);
-            if (sprite != null && alterSprite != null)
-                sprite = alterSprite(sprite);
             return sprite;
         }
 
@@ -65,9 +63,14 @@ namespace VSMenuModHelper
         public string? OnGetTabName(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Select((pair) => pair.TabName).FirstOrDefault(null as string);
 
         public bool OurTab(OptionsTabType type) => createdTabs.Where((tab) => tab.GetTabType() == type).Any();
+
+        public void AddSpriteModifier(string identifier, Func<Sprite, Sprite> spriteModifier)
+        {
+            createdTabs.First((tab) => tab.TabName == identifier).spriteModifiers.Add(spriteModifier);
+        }
     }
 
-    public class Tab {
+    internal class Tab {
 
         public string TabName { get; set; }
         private static OptionsTabType MinTypeValue = Enum.GetValues<OptionsController.OptionsTabType>().Max() + 1;
@@ -76,6 +79,7 @@ namespace VSMenuModHelper
         private readonly Uri? TabButtonSpriteUri;
         private bool alreadyInit = false;
         private readonly List<UIElement> elements;
+        public List<Func<Sprite, Sprite>> spriteModifiers { get; set; } = new();
 
         private Tab(string name)
         {
@@ -111,12 +115,14 @@ namespace VSMenuModHelper
             {
                 Sprite sprite =  SpriteImporter.LoadSprite(TabButtonSpritePath);
                 sprite.name = TabName;
+                spriteModifiers.ForEach(mod => sprite = mod.Invoke(sprite));
                 return sprite;
             }
             else if (TabButtonSpriteUri != null)
             {
                 Sprite sprite = SpriteImporter.LoadSprite(TabButtonSpriteUri);
                 sprite.name = TabName;
+                spriteModifiers.ForEach(mod => sprite = mod.Invoke(sprite));
                 return sprite;
             }
             throw new InvalidOperationException("Sprite path and uri are both null, one must be set.");

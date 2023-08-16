@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace VSMenuModHelper
 {
-    public class SpriteImporter : MonoBehaviour
+    internal class SpriteImporter : MonoBehaviour
     {
         public static Texture2D LoadTexture(string FilePath)
         {
