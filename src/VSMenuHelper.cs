@@ -14,6 +14,7 @@ using Il2CppInterop.Runtime;
 using UnityEngine.UI;
 using Il2CppVampireSurvivors;
 using System.Runtime.ExceptionServices;
+using Il2CppVampireSurvivors.App.Tools;
 
 namespace VSMenuModHelper
 {
@@ -38,7 +39,6 @@ namespace VSMenuModHelper
         {
             optionsMenuController = new();
             spriteModifiers = new();
-            mainThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
 
         public override void OnEarlyInitializeMelon()
@@ -96,96 +96,158 @@ namespace VSMenuModHelper
             static bool BuildPage_Prefix(OptionsController __instance, OptionsTabType type) => Instance.optionsMenuController.OnBuildPage(__instance, type);
         }
 
-        static int mainThreadId;
-        public static bool IsMainThread
-        {
-            get { return System.Threading.Thread.CurrentThread.ManagedThreadId == mainThreadId; }
-        }
-
-        [HarmonyPatch(typeof(PrefabReassembler))]
-        static class PrefabReassembler_Patch
-        {
-
-            //public static List<PrefabReassembler> instances = new();
-
-            [HarmonyPatch(nameof(PrefabReassembler.Start))]
-            [HarmonyPrefix]
-            static void Start_Prefix(PrefabReassembler __instance) => Melon<VSMenuHelper>.Logger.Msg($"Start_Prefix");
-
-            [HarmonyPatch(nameof(PrefabReassembler.Start))]
-            [HarmonyPostfix]
-            static void Start_Postfix(PrefabReassembler __instance) => Melon<VSMenuHelper>.Logger.Msg($"Start_Postfix");
-
-            //[HarmonyPatch(nameof(PrefabReassembler.Update))]
-            //[HarmonyPostfix]
-            //static void Update_Postfix(PrefabReassembler __instance)
-            //{
-            //    if (IsMainThread)
-            //    {
-            //        //if (__instance._PrefabComponents != null && __instance._PrefabComponents.Count > 0)
-            //        //    if (__instance._PrefabComponents[^1] != null && __instance._PrefabComponents[^1].name != null)
-            //        //        Melon<VSMenuHelper>.Logger.Msg($"prefab: {__instance._PrefabComponents[^1].name}");
-            //    }
-            //}
-
-
-
-            //[HarmonyPatch(nameof(PrefabReassembler.Update))]
-            //[HarmonyPrefix]
-            //static void Update_Prefix(PrefabReassembler __instance) => instances.Add(__instance);
-
-            [HarmonyPatch(nameof(PrefabReassembler.SpawnRoutine))]
-            [HarmonyPrefix]
-            static void SpawnRoutine_Prefix(PrefabReassembler __instance) => Melon<VSMenuHelper>.Logger.Msg($"SpawnRoutine_Prefix");
-
-            [HarmonyPatch(nameof(PrefabReassembler.SpawnRoutine))]
-            [HarmonyPostfix]
-            static void SpawnRoutine_Postfix(PrefabReassembler __instance) => Melon<VSMenuHelper>.Logger.Msg($"SpawnRoutine_Postfix");
-        }
-
         [HarmonyPatch(typeof(OptionsController))]
         class OptionsController_Patch2
         {
 
-            static GameObject _content;
+            static RectTransform _content;
+
+            //[HarmonyPatch(nameof(OptionsController.Initialize))]
+            //[HarmonyPrefix]
+            //static void Initialize_Prefix2(OptionsController __instance)
+            //{
+            //    //Texture2D[] textures = Resources.LoadAll<Texture2D>("");
+            //    //List<string> names = textures.Select(t => t.name).ToList();
+            //    //Component[] prefabs = Resources.LoadAll<Component>("");
+            //    //List<string> prefabsnames = prefabs.Select(t => t.name).ToList();
+            //    //Sprite[] uiSprites = Resources.LoadAll<Sprite>("spritesheets/UI");
+
+            //    GameObject TabScroll = new GameObject("TabScroll", Il2CppType.Of<RectTransform>());
+            //    TabScroll.transform.SetParent(__instance._TabContainer, false);
+
+            //    List<string> gameObjects = Resources.LoadAll<GameObject>("").Select((g) => g.name).ToList();
+
+            //    //prefabs = Resources.LoadAll<Component>("PrefabInstance");
+            //    //prefabsnames = prefabs.Select(t => t.name).ToList();
+
+            //    GameObject viewport = new GameObject("Viewport", Il2CppType.Of<RectTransform>());
+            //    viewport.transform.SetParent(TabScroll.transform, false);
+
+
+            //    GameObject content = new GameObject("Content", Il2CppType.Of<RectTransform>());
+            //    content.transform.SetParent(viewport.transform, false);
+
+            //    //UnityEngine.Object.Instantiate()
+            //    GameObject Scrollbar = new GameObject("Scrollbar Vertical", Il2CppType.Of<Scrollbar>());
+            //    Scrollbar.transform.SetParent(TabScroll.transform);
+
+            //    GameObject Slider = new GameObject("Slider", Il2CppType.Of<Scrollbar>());
+
+            //    ScrollEnhancer enhancer = TabScroll.AddComponent<ScrollEnhancer>();
+            //    //Scrollbar scrollbar = enhancer.gameObject.AddComponent<Scrollbar>();
+            //    UnityEngine.UI.Slider slider = enhancer.gameObject.AddComponent<UnityEngine.UI.Slider>();
+            //    enhancer.Initialize(1, viewport.GetComponent<RectTransform>(), Scrollbar.GetComponent<Scrollbar>(), slider, 0.1f);
+
+            //    _content = content;
+            //}
+
+            static RectTransform CreateScrollViewContent(ScrollRect scrollRect)
+            {
+                // Create a Content GameObject and set its properties.
+                GameObject contentObject = new GameObject("Content");
+                contentObject.AddComponent<RectTransform>(); // Required for layout control.
+                contentObject.AddComponent<VerticalLayoutGroup>();
+                contentObject.AddComponent<ContentSizeFitter>();
+
+                VerticalLayoutGroup layoutGroup = contentObject.GetComponent<VerticalLayoutGroup>();
+                layoutGroup.childControlHeight = false;
+                layoutGroup.childControlWidth = false;
+                layoutGroup.spacing = 55;
+
+                // Set the Content's RectTransform properties.
+                RectTransform contentRectTransform = contentObject.GetComponent<RectTransform>();
+                contentRectTransform.SetParent(scrollRect.transform, false);
+                //contentRectTransform.SetParent(contentObject.transform, false);
+                contentRectTransform.anchorMin = Vector2.up;
+                contentRectTransform.anchorMax = Vector2.one;
+                contentRectTransform.pivot = Vector2.up;
+
+                // Add your UI elements (Text, Images, etc.) to the contentGameObject.
+
+                layoutGroup.SetDirty();
+
+                return contentRectTransform;
+            }
+
+            static RectTransform CreateScrollViewViewport(GameObject scrollViewObject)
+            {
+                // Create a Viewport GameObject and set its properties.
+                GameObject viewportObject = new GameObject("Viewport");
+                viewportObject.AddComponent<RectTransform>(); // Required for layout control.
+
+                // Set the Viewport's RectTransform properties.
+                RectTransform viewportRectTransform = viewportObject.GetComponent<RectTransform>();
+                viewportRectTransform.SetParent(scrollViewObject.transform, false);
+
+                // Create a Mask component and add it to the Viewport GameObject.
+                Mask mask = viewportObject.AddComponent<Mask>();
+                mask.showMaskGraphic = true; // Set to true if you want to see the masked area.
+                mask.m_RectTransform = viewportRectTransform;
+
+                return viewportRectTransform;
+            }
+
+            static Scrollbar CreateScrollbar(ScrollRect scrollRect, Scrollbar.Direction direction)
+            {
+                // Create a Scrollbar GameObject and set its properties.
+                GameObject scrollbarObject = new GameObject("Scrollbar");
+                scrollbarObject.AddComponent<RectTransform>(); // Required for layout control.
+
+                // Set the Scrollbar's RectTransform properties.
+                RectTransform scrollbarRectTransform = scrollbarObject.GetComponent<RectTransform>();
+                scrollbarRectTransform.SetParent(scrollRect.transform, false);
+
+                // Add the Scrollbar component.
+                Scrollbar scrollbar = scrollbarObject.AddComponent<Scrollbar>();
+                scrollbar.direction = direction;
+
+                // Create a Scrollbar handle and set its properties.
+                GameObject handleObject = new GameObject("Handle");
+                handleObject.AddComponent<RectTransform>(); // Required for layout control.
+
+                // Set the Handle's RectTransform properties.
+                RectTransform handleRectTransform = handleObject.GetComponent<RectTransform>();
+                handleRectTransform.SetParent(scrollbarRectTransform, false);
+
+                scrollbar.handleRect = handleRectTransform;
+
+                return scrollbar;
+            }
 
             [HarmonyPatch(nameof(OptionsController.Initialize))]
             [HarmonyPrefix]
             static void Initialize_Prefix2(OptionsController __instance)
             {
-                Texture2D[] textures = Resources.LoadAll<Texture2D>("");
-                List<string> names = textures.Select(t => t.name).ToList();
-                Component[] prefabs = Resources.LoadAll<Component>("");
-                List<string> prefabsnames = prefabs.Select(t => t.name).ToList();
-                Sprite[] uiSprites = Resources.LoadAll<Sprite>("spritesheets/UI");
+                GameObject tabObject = __instance._TabContainer.gameObject;
+                if (__instance._TabContainer.FindChild("ScrollView") != null)
+                {
+                    List<Transform> children = new();
+                    for (int i = 0; i < _content.childCount; i++)
+                    {
+                        children.Add(_content.GetChild(i).transform);
+                    }
+                    children.ForEach((child) => child.SetParent(__instance._TabContainer, false));
+                    GameObject.DestroyImmediate(__instance._TabContainer.FindChild("ScrollView").gameObject);
+                }
 
-                GameObject TabScroll = new GameObject("TabScroll", Il2CppType.Of<RectTransform>());
-                TabScroll.transform.SetParent(__instance._TabContainer, false);
+                if (__instance._TabContainer.FindChild("ScrollView") == null)
+                {
+                    GameObject scrollViewObject = new GameObject("ScrollView");
+                    scrollViewObject.transform.SetParent(tabObject.transform, false);
 
-                List<string> gameObjects = Resources.LoadAll<GameObject>("").Select((g) => g.name).ToList();
+                    // Add a ScrollRect component to the ScrollView GameObject.
+                    ScrollRect scrollRect = scrollViewObject.AddComponent<ScrollRect>();
+                    scrollRect.content = CreateScrollViewContent(scrollRect);
 
-                prefabs = Resources.LoadAll<Component>("PrefabInstance");
-                prefabsnames = prefabs.Select(t => t.name).ToList();
+                    _content = scrollRect.content;
 
-                GameObject viewport = new GameObject("Viewport", Il2CppType.Of<RectTransform>());
-                viewport.transform.SetParent(TabScroll.transform, false);
-
-
-                GameObject content = new GameObject("Content", Il2CppType.Of<RectTransform>());
-                content.transform.SetParent(viewport.transform, false);
-
-                //UnityEngine.Object.Instantiate()
-                GameObject Scrollbar = new GameObject("Scrollbar Vertical", Il2CppType.Of<Scrollbar>());
-                Scrollbar.transform.SetParent(TabScroll.transform);
-
-                GameObject Slider = new GameObject("Slider", Il2CppType.Of<Scrollbar>());
-
-                ScrollEnhancer enhancer = TabScroll.AddComponent<ScrollEnhancer>();
-                //Scrollbar scrollbar = enhancer.gameObject.AddComponent<Scrollbar>();
-                UnityEngine.UI.Slider slider = enhancer.gameObject.AddComponent<UnityEngine.UI.Slider>();
-                enhancer.Initialize(1, viewport.GetComponent<RectTransform>(), Scrollbar.GetComponent<Scrollbar>(), slider, 0.1f);
-
-                _content = content;
+                    // Create and set the viewport and scrollbar properties.
+                    scrollRect.viewport = CreateScrollViewViewport(scrollViewObject);
+                    scrollRect.verticalScrollbar = CreateScrollbar(scrollRect, Scrollbar.Direction.BottomToTop);
+                    scrollRect.horizontal = false;
+                    //scrollRect.horizontalNormalizedPosition = 0.3f;
+                    scrollRect.scrollSensitivity = 2;
+                }
             }
 
             [HarmonyPatch(nameof(OptionsController.BuildPage))]
@@ -196,12 +258,13 @@ namespace VSMenuModHelper
                 List<Transform> children = new();
                 for (int i = 0; i < __instance._TabContainer.childCount; i++)
                 {
-                    if (__instance._TabContainer.GetChild(i).name != "TabScroll")
+                    if (__instance._TabContainer.GetChild(i).name != "ScrollView")
                     {
                         children.Add(__instance._TabContainer.GetChild(i).transform);
                     }
                 }
-                children.ForEach((child) => child.parent = _content.transform);
+                children.ForEach((child) => child.SetParent(_content, false));
+                __instance._TabContainer.GetComponentInChildren<VerticalLayoutGroup>().SetDirty();
             }
 
             [HarmonyPatch(nameof(OptionsController.GenerateNavigation))]
