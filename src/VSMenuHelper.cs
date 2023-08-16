@@ -110,7 +110,7 @@ namespace VSMenuModHelper
         class OptionsController_Patch2
         {
 
-            public static RectTransform rectTransform;
+            public static RectTransform _rectTransform;
 
             static RectTransform CreateScrollViewContent(RectTransform viewportRectTransform)
             {
@@ -158,7 +158,6 @@ namespace VSMenuModHelper
                 Image image = viewportObject.AddComponent<Image>();
                 image.m_Type = Image.Type.Sliced;
                 image.material = material;
-                image.sprite = Resources.FindObjectsOfTypeAll<Sprite>().Where(s => s.name == "UIMask").FirstOrDefault(null as Sprite);
 
                 mask.m_Graphic = image;
                 mask.m_MaskMaterial = material;
@@ -191,7 +190,7 @@ namespace VSMenuModHelper
                     rectTransform.sizeDelta = Vector2.zero;
                     rectTransform.anchoredPosition = Vector2.zero;
 
-                    rectTransform = scrollRect.content;
+                    _rectTransform = scrollRect.content;
                 }
 
                 List<Transform> children = new();
@@ -202,7 +201,7 @@ namespace VSMenuModHelper
                         children.Add(__instance._TabContainer.GetChild(i).transform);
                     }
                 }
-                children.ForEach((child) => child.SetParent(rectTransform, false));
+                children.ForEach((child) => child.SetParent(_rectTransform, false));
 
                 if (__instance._TabContainer.GetComponent<VerticalLayoutGroup>() != null)
                 {
