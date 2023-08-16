@@ -62,6 +62,15 @@ namespace ExampleMod
 
             VSMenuHelper.Instance.DeclareOptionsTab("Config Tab", imagePath);
             VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 2", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 3", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 4", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 5", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 6", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 7", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 8", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 9", imageUrl);
+            VSMenuHelper.Instance.DeclareOptionsTab("Empty Tab 10", imageUrl);
 
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new Title("Config Tab"));
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new TickBox("enabled", () => enabled.Value, (value) => enabled.Value = value));

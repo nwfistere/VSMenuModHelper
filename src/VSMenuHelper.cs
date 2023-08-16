@@ -1,20 +1,13 @@
-﻿using Il2CppVampireSurvivors.UI;
+﻿using HarmonyLib;
+using Il2CppVampireSurvivors.UI;
 using MelonLoader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Il2CppVampireSurvivors.UI.OptionsController;
 using UnityEngine;
-using HarmonyLib;
-using static MelonLoader.MelonLogger;
-using UnityEngine.UIElements;
-using Il2CppInterop.Runtime;
 using UnityEngine.UI;
-using Il2CppVampireSurvivors;
-using System.Runtime.ExceptionServices;
-using Il2CppVampireSurvivors.App.Tools;
+using UnityEngine.UIElements;
+using static Il2CppVampireSurvivors.UI.OptionsController;
 
 namespace VSMenuModHelper
 {
@@ -96,6 +89,18 @@ namespace VSMenuModHelper
             static bool BuildPage_Prefix(OptionsController __instance, OptionsTabType type) => Instance.optionsMenuController.OnBuildPage(__instance, type);
         }
 
+#if DEBUG
+        [HarmonyPatch("Il2CppInterop.HarmonySupport.Il2CppDetourMethodPatcher", "ReportException")]
+        public static class Patch_Il2CppDetourMethodPatcher
+        {
+            public static bool Prefix(Exception ex)
+            {
+                MelonLogger.Error("During invoking native->managed trampoline", ex);
+                return false;
+            }
+        }
+#endif
+
         [HarmonyPatch(typeof(OptionsController))]
         class OptionsController_Patch2
         {
@@ -153,6 +158,7 @@ namespace VSMenuModHelper
                 layoutGroup.childControlHeight = false;
                 layoutGroup.childControlWidth = false;
                 layoutGroup.spacing = 55;
+                //layoutGroup.padding = new RectOffset(0, 0, 0, 40);
 
                 // Set the Content's RectTransform properties.
                 RectTransform contentRectTransform = contentObject.GetComponent<RectTransform>();
@@ -161,6 +167,9 @@ namespace VSMenuModHelper
                 contentRectTransform.anchorMin = Vector2.up;
                 contentRectTransform.anchorMax = Vector2.one;
                 contentRectTransform.pivot = Vector2.up;
+
+                ContentSizeFitter contentSizeFitter = contentObject.GetComponent<ContentSizeFitter>();
+                contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
                 // Add your UI elements (Text, Images, etc.) to the contentGameObject.
 
@@ -179,10 +188,25 @@ namespace VSMenuModHelper
                 RectTransform viewportRectTransform = viewportObject.GetComponent<RectTransform>();
                 viewportRectTransform.SetParent(scrollViewObject.transform, false);
 
+                viewportRectTransform.anchorMin = Vector2.zero;
+                viewportRectTransform.anchorMax = Vector2.one;
+                viewportRectTransform.sizeDelta = Vector2.zero;
+
+                Mask displayMask = GameObject.Find("UI/Canvas - App/Safe Area/View - Options/OptionsController/Display/Scroll/Viewport").GetComponent<Mask>();
+
                 // Create a Mask component and add it to the Viewport GameObject.
                 Mask mask = viewportObject.AddComponent<Mask>();
                 mask.showMaskGraphic = true; // Set to true if you want to see the masked area.
                 mask.m_RectTransform = viewportRectTransform;
+                mask.m_Graphic = displayMask.m_Graphic;
+                mask.m_MaskMaterial = displayMask.m_MaskMaterial;
+                mask.m_UnmaskMaterial = displayMask.m_UnmaskMaterial;
+
+                mask = displayMask;
+
+                UnityEngine.UI.Image maskImage = viewportObject.AddComponent<UnityEngine.UI.Image>();
+                maskImage.sprite = SpriteImporter.LoadSprite(mask.m_Graphic.mainTexture.Cast<Texture2D>());
+                //maskImage.mainTexture = mask.m_Graphic.mainTexture;
 
                 return viewportRectTransform;
             }
@@ -239,6 +263,11 @@ namespace VSMenuModHelper
                     ScrollRect scrollRect = scrollViewObject.AddComponent<ScrollRect>();
                     scrollRect.content = CreateScrollViewContent(scrollRect);
 
+                    RectTransform rectTransform = scrollViewObject.GetComponent<RectTransform>();
+                    rectTransform.anchorMin = Vector2.zero;
+                    rectTransform.anchorMax = Vector2.one;
+                    rectTransform.sizeDelta = Vector2.zero;
+
                     _content = scrollRect.content;
 
                     // Create and set the viewport and scrollbar properties.
@@ -246,7 +275,8 @@ namespace VSMenuModHelper
                     scrollRect.verticalScrollbar = CreateScrollbar(scrollRect, Scrollbar.Direction.BottomToTop);
                     scrollRect.horizontal = false;
                     //scrollRect.horizontalNormalizedPosition = 0.3f;
-                    scrollRect.scrollSensitivity = 2;
+                    scrollRect.scrollSensitivity = 100;
+                    scrollRect.vertical = true;
                 }
             }
 
@@ -254,7 +284,6 @@ namespace VSMenuModHelper
             [HarmonyPostfix]
             static void BuildPage_Postfix(OptionsController __instance, OptionsTabType type)
             {
-                Melon<VSMenuHelper>.Logger.Msg($"BuildPage_Postfix");
                 List<Transform> children = new();
                 for (int i = 0; i < __instance._TabContainer.childCount; i++)
                 {
@@ -265,6 +294,14 @@ namespace VSMenuModHelper
                 }
                 children.ForEach((child) => child.SetParent(_content, false));
                 __instance._TabContainer.GetComponentInChildren<VerticalLayoutGroup>().SetDirty();
+                if (__instance._TabContainer.GetComponent<VerticalLayoutGroup>() != null)
+                {
+                    GameObject.DestroyImmediate(__instance._TabContainer.GetComponent<VerticalLayoutGroup>());
+
+                }
+
+                Mask displayMask = GameObject.Find("UI/Canvas - App/Safe Area/View - Options/OptionsController/Display/Scroll/Viewport").GetComponent<Mask>();
+                displayMask.showMaskGraphic = false;
             }
 
             [HarmonyPatch(nameof(OptionsController.GenerateNavigation))]
