@@ -3,7 +3,7 @@ using UnityEngine.Networking;
 
 namespace VSMenuModHelper
 {
-    public class TextureDownloader
+    internal class TextureDownloader
     {
         private readonly Uri textureUri;
         private byte[]? DownloadedBytes;
