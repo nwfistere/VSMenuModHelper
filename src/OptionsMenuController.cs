@@ -1,4 +1,5 @@
-﻿using Il2CppTMPro;
+﻿using Il2CppSystem.Runtime.Remoting.Messaging;
+using Il2CppTMPro;
 using Il2CppVampireSurvivors.Graphics;
 using Il2CppVampireSurvivors.UI;
 using System;
@@ -17,6 +18,8 @@ namespace VSMenuModHelper
         {
             createdTabs = new();
         }
+
+        OptionsTabType currentTab = (OptionsTabType) (-1);
 
         public void DeclareTab(string identifier, string spritePath)
         {
@@ -51,17 +54,24 @@ namespace VSMenuModHelper
         // Returns true if BuildPage should run (We didn't do anything). False if it shouldn't.
         public bool OnBuildPage(OptionsController controller, OptionsTabType type)
         {
+            currentTab = type;
             if (!createdTabs.Where((tab) => tab.GetTabType() == type).Any())
                 return true;
             Tab tab = createdTabs.First((tab) => tab.GetTabType() == type);
             tab.GetElements().ForEach((element) => element.GetElement().Invoke(controller));
 
-            List<Il2CppTMPro.TextMeshProUGUI> objects = UnityEngine.Object.FindObjectsOfTypeAll(Il2CppInterop.Runtime.Il2CppType.Of<Il2CppTMPro.TextMeshProUGUI>()).ToList().Where((o) => o.name == "Label").Select((o) => o.Cast<Il2CppTMPro.TextMeshProUGUI>()).Where((o) => o.transform.parent.name == "Options_TickBox(Clone)").ToList();
-            TextMeshProUGUI text = objects[0];
-            //text.mater
-
-
             return false;
+        }
+
+        public void OnClearPage(OptionsController controller)
+        {
+            if (currentTab != (OptionsTabType) (-1))
+            {
+                if (!createdTabs.Where((tab) => tab.GetTabType() == currentTab).Any())
+                    return;
+                Tab tab = createdTabs.First((tab) => tab.GetTabType() == currentTab);
+                tab.GetElements().ForEach((element) => element.Destroy());
+            }
         }
 
         public Sprite? OnGetTabSprite(OptionsTabType type)

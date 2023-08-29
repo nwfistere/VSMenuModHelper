@@ -59,6 +59,10 @@ namespace VSMenuModHelper
             [HarmonyPatch(nameof(OptionsController.BuildPage))]
             [HarmonyPrefix]
             static bool BuildPage_Prefix(OptionsController __instance, OptionsTabType type) => Instance.optionsMenuController.OnBuildPage(__instance, type);
+
+            [HarmonyPatch(nameof(OptionsController.ClearPage))]
+            [HarmonyPrefix]
+            static void ClearPage_Postfix(OptionsController __instance) => Instance.optionsMenuController.OnClearPage(__instance);
         }
 
 #if DEBUG

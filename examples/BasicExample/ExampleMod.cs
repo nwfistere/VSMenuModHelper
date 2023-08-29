@@ -1,6 +1,8 @@
 ﻿using MelonLoader;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 using VSMenuModHelper;
 
@@ -25,6 +27,8 @@ namespace ExampleMod
         private static MelonPreferences_Entry<bool> buttonPressed;
         private static MelonPreferences_Entry<int> dropDownValue;
         private static MelonPreferences_Entry<int> multipleChoiceValue;
+        private static MelonPreferences_Entry<Color> colorChoiceValue;
+        private static MelonPreferences_Entry<string> inputTextValue;
 
         public override void OnInitializeMelon()
         {
@@ -35,13 +39,19 @@ namespace ExampleMod
             buttonPressed = preferences.CreateEntry("buttonPressed", false);
             dropDownValue = preferences.CreateEntry("dropDownValue", 0);
             multipleChoiceValue = preferences.CreateEntry("multipleChoiceValue", 0);
-            
+            colorChoiceValue = preferences.CreateEntry("colorChoiceValue", Color.black);
+            inputTextValue = preferences.CreateEntry("inputTextValue", "");
+
             DeclareMenuTabs();
             
         }
 
+        TextInput textInput = new TextInput("Text input", () => inputTextValue.Value, () => "PlaceHolder");
+
         private void LogValues()
         {
+            inputTextValue.Value = textInput.getValue();
+
             Action<string> log = (str) => LoggerInstance.Msg($"\t{str}");
             LoggerInstance.Msg($"preferences:");
             log($"enabled: {enabled.Value}");
@@ -50,6 +60,8 @@ namespace ExampleMod
             log($"buttonPressed: {buttonPressed.Value}");
             log($"dropDownValue: {dropDownValue.Value}");
             log($"multipleChoiceValue: {multipleChoiceValue.Value}");
+            log($"colorChoiceValue: {colorChoiceValue.Value}");
+            log($"inputTextValue: {inputTextValue.Value}");
         }
 
         private void DeclareMenuTabs()
@@ -70,6 +82,9 @@ namespace ExampleMod
                 return sprite;
             });
 
+            List<Color> colorOptions = new() { Color.black, Color.blue, Color.clear, Color.white, Color.green, Color.yellow };
+            VSMenuHelper.Instance.AddElementToTab("Config Tab", new ColorDropDown("Color drop down", colorOptions, () => colorOptions.IndexOf(colorChoiceValue.Value), (value) => colorChoiceValue.Value = colorOptions[value]));
+            VSMenuHelper.Instance.AddElementToTab("Config Tab", new HorizontalRule());
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new Title("Config Tab"));
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new TickBox("enabled", () => enabled.Value, (value) => enabled.Value = value));
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new TickBox("someToggle", () => someToggle.Value, (value) => someToggle.Value = value));
@@ -77,7 +92,11 @@ namespace ExampleMod
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new Slider("Slider", () => somePercentage.Value, (value) => somePercentage.Value = value));
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new DropDown("DropDown", new() { "one", "two", "three" }, () => dropDownValue.Value, (value) => dropDownValue.Value = value));
             Action<int> action = (value) => multipleChoiceValue.Value = value;
+            VSMenuHelper.Instance.AddElementToTab("Config Tab", new HorizontalRule());
             VSMenuHelper.Instance.AddElementToTab("Config Tab", new MultipleChoice("MultipleChoice", new() { "one", "two", "three" }, new() { () => action(0), () => action(1), () => action(2) }, () => multipleChoiceValue.Value));
+            VSMenuHelper.Instance.AddElementToTab("Config Tab", new HorizontalRule());
+            VSMenuHelper.Instance.AddElementToTab("Config Tab", textInput);
+
         }
     }
 }
