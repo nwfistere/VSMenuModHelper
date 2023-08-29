@@ -26,6 +26,13 @@ namespace VSMenuModHelper
             return texture;
         }
 
+        public static Sprite LoadCharacterSprite(string FilePath)
+        {
+            Texture2D texture = LoadTexture(FilePath);
+            // Stadard characters have large values (400?) in the x y parameters of their Rect. I wonder what that's for.
+            return LoadSprite(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0f));
+        }
+
         private static readonly Dictionary<Uri, TextureDownloader> downloadCache = new();
 
         public static Texture2D LoadTexture(Uri textureUri)

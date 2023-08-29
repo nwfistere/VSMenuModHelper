@@ -1,6 +1,9 @@
-﻿using Il2CppVampireSurvivors.UI;
+﻿using Il2CppTMPro;
+using Il2CppVampireSurvivors.Graphics;
+using Il2CppVampireSurvivors.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using static Il2CppVampireSurvivors.UI.OptionsController;
@@ -29,6 +32,13 @@ namespace VSMenuModHelper
             createdTabs.Add(new(identifier, spriteUri));
         }
 
+        public void DeclareTab(string identifier, Sprite sprite)
+        {
+            if (createdTabs.Where((tab) => tab.TabName == identifier).Any())
+                throw new ArgumentException("Object with that identifier already exists.");
+            createdTabs.Add(new(identifier, sprite));
+        }
+
         public void AddElementToTab(string identifier, UIElement element)
         {
             createdTabs.First((tab) => tab.TabName == identifier).AddElement(element);
@@ -45,6 +55,11 @@ namespace VSMenuModHelper
                 return true;
             Tab tab = createdTabs.First((tab) => tab.GetTabType() == type);
             tab.GetElements().ForEach((element) => element.GetElement().Invoke(controller));
+
+            List<Il2CppTMPro.TextMeshProUGUI> objects = UnityEngine.Object.FindObjectsOfTypeAll(Il2CppInterop.Runtime.Il2CppType.Of<Il2CppTMPro.TextMeshProUGUI>()).ToList().Where((o) => o.name == "Label").Select((o) => o.Cast<Il2CppTMPro.TextMeshProUGUI>()).Where((o) => o.transform.parent.name == "Options_TickBox(Clone)").ToList();
+            TextMeshProUGUI text = objects[0];
+            //text.mater
+
 
             return false;
         }
@@ -75,8 +90,9 @@ namespace VSMenuModHelper
         public string TabName { get; set; }
         private static OptionsTabType MinTypeValue = Enum.GetValues<OptionsController.OptionsTabType>().Max() + 1;
         private readonly OptionsTabType TabType;
-        private readonly string? TabButtonSpritePath;
-        private readonly Uri? TabButtonSpriteUri;
+        private readonly string? TabButtonSpritePath; // Using a filepath
+        private readonly string? TabButtonSpriteName; // Using a sprite from resource manager
+        private readonly Uri? TabButtonSpriteUri; // Using a sprite from internet.
         private bool alreadyInit = false;
         private readonly List<UIElement> elements;
         public List<Func<Sprite, Sprite>> spriteModifiers { get; set; } = new();
@@ -90,12 +106,26 @@ namespace VSMenuModHelper
 
         public Tab(string name, string spritePath) : this(name)
         {
-            TabButtonSpritePath = spritePath;
+            // If file doesn't exist, try loading directly from SpriteManager later.
+            if (File.Exists(spritePath))
+            {
+                TabButtonSpritePath = spritePath;
+            } else
+            {
+                TabButtonSpriteName = spritePath;
+            }
         }
 
         public Tab(string name, Uri spriteUri) : this(name)
         {
             TabButtonSpriteUri = spriteUri;
+        }
+
+        public Tab(string name, Sprite sprite) : this(name)
+        {
+            TabButtonSpriteName = sprite.name;
+
+            SpriteManager.RegisterSprite(sprite);
         }
 
         public OptionsTabType GetTabType() => TabType;
@@ -122,6 +152,11 @@ namespace VSMenuModHelper
             {
                 Sprite sprite = SpriteImporter.LoadSprite(TabButtonSpriteUri);
                 sprite.name = TabName;
+                spriteModifiers.ForEach(mod => sprite = mod.Invoke(sprite));
+                return sprite;
+            } else if (TabButtonSpriteName != null)
+            {
+                Sprite sprite = SpriteManager.GetSprite(TabButtonSpriteName, false);
                 spriteModifiers.ForEach(mod => sprite = mod.Invoke(sprite));
                 return sprite;
             }

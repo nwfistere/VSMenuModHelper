@@ -1,6 +1,11 @@
-﻿using Il2CppVampireSurvivors.UI;
+﻿using Il2CppTMPro;
+using Il2CppVampireSurvivors.App.Tools;
+using Il2CppVampireSurvivors.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using UnityEngine;
+using UnityEngine.TextCore;
 
 namespace VSMenuModHelper
 {
@@ -61,6 +66,92 @@ namespace VSMenuModHelper
         public override Action<OptionsController> GetElement()
         {
             return (controller) => controller.AddTickBox(Label, GetterDelegate(), Action, IsLocalizationTerm);
+        }
+    }
+
+    public class TickBoxPro : UIElement
+    {
+        public Func<bool> GetterDelegate { get; set; }
+        public Action<bool> Action { get; set; }
+        public TickBoxPro(string label, Func<bool> getterDelegate, Action<bool> action, bool isLocalizationTerm = false) : base(label, isLocalizationTerm)
+        {
+            GetterDelegate = getterDelegate;
+            Action = action;
+        }
+        public static int i = 0;
+
+        public static List<TMP_SpriteAsset> spriteAssets = new();
+        public override Action<OptionsController> GetElement()
+        {
+            //return (controller) => controller.AddTickBox(Label, GetterDelegate(), Action, IsLocalizationTerm);
+            return (controller) =>
+            {
+                TickBoxUI tickBoxUI = controller.AddTickBox(Label, GetterDelegate(), Action, IsLocalizationTerm);
+
+                Transform childLabel = tickBoxUI.GetGameObject().transform.FindChild("Label");
+                TextMeshProUGUI label = childLabel.GetComponent<TextMeshProUGUI>();
+
+                TMP_SpriteAsset spriteAsset = new();
+
+
+                Sprite sprite = SpriteImporter.LoadSprite("C:\\Users\\Nick\\Pictures\\00051-1768801398-smol.png", new Rect(0, 0, 30, 36), new Vector2(0f, 0f));
+                sprite.name = "test";
+
+                spriteAsset = new()
+                {
+                    spriteSheet = sprite.texture,
+                    name = "test"
+                };
+
+                //label.spriteAsset = spriteAsset;
+                //label.m_currentSpriteAsset = spriteAsset;
+                //label.m_defaultSpriteAsset = spriteAsset;
+
+                GlyphMetrics metrics = new GlyphMetrics(sprite.texture.width, sprite.texture.height, -(sprite.texture.height), 0, sprite.texture.width);
+                GlyphRect rect = new(0, 0, Convert.ToInt16(metrics.width), Convert.ToInt16(metrics.height));
+                // GlyphRect rect = new(0, 0, 1, 1);
+
+                TMP_SpriteGlyph spriteGlyph = new(0, metrics, rect, 1f, 0, sprite);
+                TMP_SpriteCharacter newSprite = new(0, spriteAsset, spriteGlyph);
+                newSprite.name = "test";
+                TMP_Sprite tmp_sprite = new()
+                {
+                    sprite = sprite,
+                    id = 0,
+                    unicode = (int)newSprite.unicode,
+                    name = "test",
+                    x = 0,
+                    y = 0,
+                    pivot = sprite.pivot,
+                    xAdvance = sprite.texture.width,
+                    width = sprite.texture.width,
+                    height = sprite.texture.height,
+                    scale = 1,
+                    xOffset = sprite.texture.width / 2,
+                    yOffset = 0,
+                    hashCode = newSprite.hashCode
+                };
+
+                    
+
+
+                //spriteAsset.spriteInfoList = new();
+
+                //spriteAsset.spriteInfoList.Add(tmp_sprite);
+                spriteAsset.spriteCharacterTable.Add(newSprite);
+                spriteAsset.spriteCharacterLookupTable.Add((uint)tmp_sprite.id, newSprite);
+                spriteAsset.spriteGlyphTable.Add(spriteGlyph);
+                spriteAsset.material = label.material;
+                spriteAsset.UpdateLookupTables();
+                //spriteAsset.SetDirty();
+                //label.textInfo.characterInfo[0].spriteAsset = label.spriteAsset;
+                //label.textInfo.characterInfo[0].spriteIndex = 0;
+
+                label.text = "<sprite=0 name=\"test\"> <sprite name=\"test\"> <sprite=0>";
+
+                spriteAssets.Add(spriteAsset);
+
+            };
         }
     }
 

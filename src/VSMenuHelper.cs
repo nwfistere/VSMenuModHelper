@@ -36,6 +36,8 @@ namespace VSMenuModHelper
 
         public void DeclareOptionsTab(string identifier, string spritePath) => optionsMenuController.DeclareTab(identifier, spritePath);
         public void DeclareOptionsTab(string identifier, Uri spriteUri) => optionsMenuController.DeclareTab(identifier, spriteUri);
+
+        public void DeclareOptionsTab(string identifier, Sprite sprite) => optionsMenuController.DeclareTab(identifier, sprite);
         public void AddElementToTab(string identifier, UIElement element) => optionsMenuController.AddElementToTab(identifier, element);
         public void AddTabSpriteModifier(string identifier, Func<Sprite, Sprite> spriteModifier) => optionsMenuController.AddSpriteModifier(identifier, spriteModifier);
 
