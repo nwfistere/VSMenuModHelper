@@ -1,3 +1,11 @@
+# No longer actively developing.
+I will no longer be actively developing this mod. Feel free to fork this repo and continue development as long as you follow the [LICENSE](./LICENSE).
+  
+<br />
+<br /><br />
+<br /><br />
+<br />
+
 # VSMenuModHelper
 A library for enabling modifying Vampire Survivors option menu
 
